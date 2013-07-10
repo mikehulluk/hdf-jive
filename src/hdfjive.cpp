@@ -146,9 +146,26 @@ void HDF5DataSet2DStd::append_buffer( float* pData )
 {
     assert(settings.type==H5T_NATIVE_FLOAT);
     _write_to_array<float>(H5T_NATIVE_FLOAT, pData, settings.size, dataset_id);
-    return; 
 }
 
+
+void HDF5DataSet2DStd::append_buffer( double* pData )
+{
+    assert(settings.type==H5T_NATIVE_DOUBLE);
+    _write_to_array<double>(H5T_NATIVE_DOUBLE, pData, settings.size, dataset_id);
+}
+
+void HDF5DataSet2DStd::append_buffer( int* pData )
+{
+    assert(settings.type==H5T_NATIVE_INT);
+    _write_to_array<int>(H5T_NATIVE_INT, pData, settings.size, dataset_id);
+}
+
+void HDF5DataSet2DStd::append_buffer( long* pData )
+{
+    assert(settings.type==H5T_NATIVE_FLOAT);
+    _write_to_array<long>(H5T_NATIVE_LONG, pData, settings.size, dataset_id);
+}
 
 
 

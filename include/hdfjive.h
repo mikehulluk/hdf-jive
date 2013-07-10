@@ -86,8 +86,8 @@ public:
     HDF5DataSet2DStdSettings(size_t size, hid_t type)
         : size(size), type(type) {}
 
-    HDF5DataSet2DStdSettings(size_t size)
-        : size(size),  type(H5T_NATIVE_FLOAT) {}
+    //HDF5DataSet2DStdSettings(size_t size)
+    //    : size(size),  type(H5T_NATIVE_FLOAT) {}
 
 };
 
@@ -100,30 +100,40 @@ class HDF5DataSet2DStd : public  boost::enable_shared_from_this<HDF5DataSet2DStd
     hid_t dataset_id;
     hid_t dataspace_id;
     HDF5DataSet2DStdSettings settings;
+
 public:
     HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet2DStdSettings& settings);
     ~HDF5DataSet2DStd();
 
 
-    // For floats:
-    //template<typename TYPE>
-    inline void append_buffer( FloatBuffer fb )
+    // For the different datatypes:
+    void append_buffer( float* pData );
+    void append_buffer( double* pData );
+    void append_buffer( int* pData );
+    void append_buffer( long* pData );
+
+
+
+    // Convience methods:
+    // ///////////////////////////
+    template<typename TYPE>
+    inline void append_buffer( DataBuffer<TYPE> fb )
     {
         assert(fb.size() == this->settings.size);
         this->append_buffer(fb.get_data_pointer() );
     }
-    inline void append( float value) 
-    { 
-        assert(settings.size==1); append_buffer(&value); 
+
+    // Single values:
+    template<typename TYPE>
+    inline void append( TYPE value)
+    {
+        assert(settings.size==1); append_buffer(&value);
     }
 
-    
-    void append_buffer( float* pData );
 
 
 
-    // For ints:
-    //
+
 };
 
 
