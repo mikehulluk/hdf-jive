@@ -62,8 +62,14 @@ DataBuffer<TYPE> operator|(DataBuffer<TYPE> buff, TYPE data)
     return buff;
 }
 
+// Types of buffers:
 typedef DataBuffer<float> FloatBuffer;
 typedef FloatBuffer FB;
+
+typedef DataBuffer<int> IntBuffer;
+typedef FloatBuffer IB;
+
+
 
 
 
@@ -75,11 +81,13 @@ typedef FloatBuffer FB;
 class HDF5DataSet2DStdSettings
 {
 public:
-    size_t size;
-    HDF5DataSet2DStdSettings(size_t size)
-        : size(size)
-    {}
+    const size_t size;
+    const hid_t type; // H5T_NATIVE_CHAR, H5T_NATIVE_SHORT, H5T_NATIVE_INT, H5T_NATIVE_LONG, H5T_NATIVE_FLOAT
+    HDF5DataSet2DStdSettings(size_t size, hid_t type)
+        : size(size), type(type) {}
 
+    HDF5DataSet2DStdSettings(size_t size)
+        : size(size),  type(H5T_NATIVE_FLOAT) {}
 
 };
 
@@ -96,8 +104,26 @@ public:
     HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet2DStdSettings& settings);
     ~HDF5DataSet2DStd();
 
+
+    // For floats:
+    //template<typename TYPE>
+    inline void append_buffer( FloatBuffer fb )
+    {
+        assert(fb.size() == this->settings.size);
+        this->append_buffer(fb.get_data_pointer() );
+    }
+    inline void append( float value) 
+    { 
+        assert(settings.size==1); append_buffer(&value); 
+    }
+
+    
     void append_buffer( float* pData );
-    void append_buffer( FloatBuffer fb );
+
+
+
+    // For ints:
+    //
 };
 
 

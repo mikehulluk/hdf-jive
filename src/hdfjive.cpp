@@ -88,7 +88,9 @@ HDF5DataSet2DStd::HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent
     hsize_t chunk_dims[2] = {50, settings.size}; 
     hid_t prop = H5Pcreate(H5P_DATASET_CREATE);
     H5Pset_chunk (prop, 2, chunk_dims);
-    dataset_id = H5Dcreate2 (pParent.lock()->group_id, name.c_str(), H5T_NATIVE_FLOAT, dataspace_id, H5P_DEFAULT, prop, H5P_DEFAULT);
+
+
+    dataset_id = H5Dcreate2 (pParent.lock()->group_id, name.c_str(), settings.type, dataspace_id, H5P_DEFAULT, prop, H5P_DEFAULT);
 
 
     H5Pclose (prop);
@@ -106,24 +108,21 @@ HDF5DataSet2DStd::~HDF5DataSet2DStd()
 }
 
 
-void HDF5DataSet2DStd::append_buffer( float* pData )
-{
-    cout << "\nWriting to buffer";
 
+
+
+template<typename T>
+void _write_to_array(hid_t datatype, T* pData, size_t n, hid_t dataset_id)
+{
     // How big is the array:?
     hsize_t dims[2], max_dims[2];
     hid_t dataspace = H5Dget_space(dataset_id);
     H5Sget_simple_extent_dims(dataspace, dims, max_dims);
     H5Sclose(dataspace);
 
-    cout << "\nDims:" << dims[0] << ", " << dims[1] << "\n";
-    assert(dims[1] ==settings.size);
+    assert(dims[1] == n);
 
     int curr_size = dims[0];
-
-
-
-
 
     // Extend the table:
     hsize_t new_data_dims[2] = {curr_size+1, dims[1] };
@@ -136,16 +135,37 @@ void HDF5DataSet2DStd::append_buffer( float* pData )
     H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
     hsize_t dim1[2] = {1,dims[1]};
     hid_t memspace = H5Screate_simple(2, dim1, NULL);
-    H5Dwrite (dataset_id, H5T_NATIVE_FLOAT, memspace, filespace, H5P_DEFAULT, pData);
+    H5Dwrite (dataset_id, datatype, memspace, filespace, H5P_DEFAULT, pData);
+
 
 }
 
-void HDF5DataSet2DStd::append_buffer( FloatBuffer fb )
+
+
+void HDF5DataSet2DStd::append_buffer( float* pData )
 {
-    assert(fb.size() == this->settings.size);
-    this->append_buffer(fb.get_data_pointer() );
-
+    assert(settings.type==H5T_NATIVE_FLOAT);
+    _write_to_array<float>(H5T_NATIVE_FLOAT, pData, settings.size, dataset_id);
+    return; 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -195,7 +215,7 @@ HDF5Group::~HDF5Group()
 
 HDF5GroupPtr HDF5Group::get_subgroup(const string& location_in)
 {
-    cout << "\nGetting Group: " << location << "\n";
+    //cout << "\nGetting Group: " << location << "\n";
 
 
 
@@ -262,7 +282,7 @@ HDF5DataSet2DStdPtr HDF5Group::get_dataset(const string& name)
 
     if(loc.is_local())
     {
-        cout << "Looking for dataset: " << loc.get_local_path() << "\n";
+        //cout << "Looking for dataset: " << loc.get_local_path() << "\n";
         assert( datasets.find(loc.get_local_path()) != datasets.end() );
         return datasets[loc.get_local_path()];
     }

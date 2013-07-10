@@ -28,6 +28,11 @@ ds->append_buffer(FB() | 2.4f | 4.6f | 4.5f | 9.6f );
 
 HDFManager::getInstance().get_file("myfile.hdf")->get_dataset("/SimulationResults/P1/P2/d1")->append_buffer( FB() | 1.1f | 2.2f | 3.3f | 4.4f );
 
+pGroup->create_dataset("d2", HDF5DataSet2DStdSettings(1) );
+pGroup->get_dataset("d2")->append(30);
+pGroup->get_dataset("d2")->append(40);
+pGroup->get_dataset("d2")->append(50);
+
 
 cout << "\n     **** FINISHED OK **** \n";
 }
