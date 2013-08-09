@@ -86,9 +86,6 @@ public:
     HDF5DataSet2DStdSettings(size_t size, hid_t type)
         : size(size), type(type) {}
 
-    //HDF5DataSet2DStdSettings(size_t size)
-    //    : size(size),  type(H5T_NATIVE_FLOAT) {}
-
 };
 
 
@@ -161,16 +158,19 @@ public:
     typedef map<const string, HDF5GroupPtr> GroupPtrMap;
     GroupPtrMap groups;
 
+    // Subgroups:
     HDF5GroupPtr get_subgroup(const string& location);
     HDF5GroupPtr get_subgrouplocal(const string& location);
 
-
+    // Datasets:
     typedef map<const string, HDF5DataSet2DStdPtr> DatasetPtrMap;
     DatasetPtrMap datasets;
     HDF5DataSet2DStdPtr create_dataset(const string& name, const HDF5DataSet2DStdSettings& settings);
     HDF5DataSet2DStdPtr get_dataset(const string& name);
     HDF5GroupPtr get_datasetlocal(const string& location);
 
+    // Links:
+    //void create_hardlink(const  HDF5DataSet2DStdPtr& target);
 
 
 };

@@ -79,7 +79,6 @@ class _HDF5Location
 HDF5DataSet2DStd::HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet2DStdSettings& settings)
     :name(name), settings(settings)
 {
-    cout << "\nCreating DataSet:" << name  << " \n";
 
     hsize_t data_dims[2] = {0, settings.size};
     hsize_t data_max_dims[2] = {H5S_UNLIMITED, settings.size} ;
@@ -102,7 +101,7 @@ HDF5DataSet2DStd::HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent
 
 HDF5DataSet2DStd::~HDF5DataSet2DStd()
 {
-    cout << "\nClosing DataSet:" << name  << " \n";
+    //cout << "\nClosing DataSet:" << name  << " \n";
     H5Dclose(dataset_id);
     H5Sclose(dataspace_id);
 }
@@ -137,6 +136,9 @@ void _write_to_array(hid_t datatype, T* pData, size_t n, hid_t dataset_id)
     hid_t memspace = H5Screate_simple(2, dim1, NULL);
     H5Dwrite (dataset_id, datatype, memspace, filespace, H5P_DEFAULT, pData);
 
+
+    H5Sclose(memspace);
+    H5Sclose(filespace);
 
 }
 
@@ -259,6 +261,7 @@ HDF5GroupPtr HDF5Group::get_subgrouplocal(const string& location)
 
     assert( location.find("/") == string::npos );
 
+    // Group does not exist:
     if( groups.find(location) == groups.end() )
     {
         fileptr.lock();
@@ -299,7 +302,6 @@ HDF5DataSet2DStdPtr HDF5Group::get_dataset(const string& name)
 
     if(loc.is_local())
     {
-        //cout << "Looking for dataset: " << loc.get_local_path() << "\n";
         assert( datasets.find(loc.get_local_path()) != datasets.end() );
         return datasets[loc.get_local_path()];
     }
@@ -380,6 +382,7 @@ HDF5DataSet2DStdPtr HDF5File::get_dataset(const string& location)
 herr_t my_hdf5_error_handler (void *unused)
 {
    fprintf (stderr, "An HDF5 error was detected. Bye.\n");
+   H5Eprint(stderr);
    assert(0);
    exit (1);
 }
