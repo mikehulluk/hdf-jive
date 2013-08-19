@@ -124,10 +124,16 @@ public:
     template<typename TYPE>
     inline void append( TYPE value)
     {
-        assert(settings.size==1); append_buffer(&value);
+        assert(settings.size==1); 
+        append_buffer(&value);
     }
 
 
+    void set_data(size_t m, size_t n, double* pData);
+    void set_data(size_t m, size_t n, float* pData);
+    void set_data(size_t m, size_t n, int* pData);
+    void set_data(size_t m, size_t n, long* pData);
+    
 
 
 

@@ -111,8 +111,12 @@ HDF5DataSet2DStd::~HDF5DataSet2DStd()
 
 
 template<typename T>
-void _write_to_array(hid_t datatype, T* pData, size_t n, hid_t dataset_id)
+void _append_to_array(hid_t datatype, T* pData, size_t n, hid_t dataset_id)
 {
+    //cout << "\nWriting: ";
+    //for(size_t i=0;i<n;i++) cout << pData[i] << ", ";
+
+
     // How big is the array:?
     hsize_t dims[2], max_dims[2];
     hid_t dataspace = H5Dget_space(dataset_id);
@@ -126,6 +130,8 @@ void _write_to_array(hid_t datatype, T* pData, size_t n, hid_t dataset_id)
     // Extend the table:
     hsize_t new_data_dims[2] = {curr_size+1, dims[1] };
     H5Dextend (dataset_id, new_data_dims);
+
+    //cout << "\n   - New dimension: " << curr_size+1;
 
     // And copy:
     hid_t filespace = H5Dget_space(dataset_id);
@@ -147,33 +153,89 @@ void _write_to_array(hid_t datatype, T* pData, size_t n, hid_t dataset_id)
 void HDF5DataSet2DStd::append_buffer( float* pData )
 {
     assert(settings.type==H5T_NATIVE_FLOAT);
-    _write_to_array<float>(H5T_NATIVE_FLOAT, pData, settings.size, dataset_id);
+    _append_to_array<float>(H5T_NATIVE_FLOAT, pData, settings.size, dataset_id);
 }
 
 
 void HDF5DataSet2DStd::append_buffer( double* pData )
 {
     assert(settings.type==H5T_NATIVE_DOUBLE);
-    _write_to_array<double>(H5T_NATIVE_DOUBLE, pData, settings.size, dataset_id);
+    _append_to_array<double>(H5T_NATIVE_DOUBLE, pData, settings.size, dataset_id);
 }
 
 void HDF5DataSet2DStd::append_buffer( int* pData )
 {
     assert(settings.type==H5T_NATIVE_INT);
-    _write_to_array<int>(H5T_NATIVE_INT, pData, settings.size, dataset_id);
+    _append_to_array<int>(H5T_NATIVE_INT, pData, settings.size, dataset_id);
 }
 
 void HDF5DataSet2DStd::append_buffer( long* pData )
 {
     assert(settings.type==H5T_NATIVE_FLOAT);
-    _write_to_array<long>(H5T_NATIVE_LONG, pData, settings.size, dataset_id);
+    _append_to_array<long>(H5T_NATIVE_LONG, pData, settings.size, dataset_id);
 }
 
 
 
 
 
+template<typename T>
+void _write_to_array(hid_t datatype, T* pData, size_t M, size_t N, hid_t dataset_id)
+{
 
+    // How big is the array:?
+    //hsize_t dims[2], max_dims[2];
+    //hid_t dataspace = H5Dget_space(dataset_id);
+    //H5Sget_simple_extent_dims(dataspace, dims, max_dims);
+    //H5Sclose(dataspace);
+
+    //assert(dims[1] == N);
+
+    //int curr_size = dims[0];
+
+    // Extend the table:
+    hsize_t new_data_dims[2] = {M,N}; //curr_size+1, dims[1] };
+    H5Dextend (dataset_id, new_data_dims);
+
+    //cout << "\n   - New dimension: " << curr_size+1;
+
+    // And copy:
+    hid_t filespace = H5Dget_space(dataset_id);
+    hsize_t offset[2] = {0, 0};
+    hsize_t count[2] = {M, N};
+    H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
+    hsize_t dim1[2] = {M,N};
+    hid_t memspace = H5Screate_simple(2, dim1, NULL);
+    H5Dwrite (dataset_id, datatype, memspace, filespace, H5P_DEFAULT, pData);
+
+
+    H5Sclose(memspace);
+    H5Sclose(filespace);
+
+}
+
+
+void HDF5DataSet2DStd::set_data(size_t m, size_t n, float* pData)
+{
+    assert(settings.type==H5T_NATIVE_FLOAT);
+    assert(m==settings.size);
+    _write_to_array<float>(H5T_NATIVE_FLOAT, pData, m, n, dataset_id);
+}
+void HDF5DataSet2DStd::set_data(size_t m, size_t n, double* pData)
+{
+    assert(settings.type==H5T_NATIVE_DOUBLE);
+    _write_to_array<double>(H5T_NATIVE_DOUBLE, pData, m, n, dataset_id);
+}
+void HDF5DataSet2DStd::set_data(size_t m, size_t n, int* pData)
+{
+    assert(settings.type==H5T_NATIVE_INT);
+    _write_to_array<int>(H5T_NATIVE_INT, pData, m, n, dataset_id);
+}
+void HDF5DataSet2DStd::set_data(size_t m, size_t n, long* pData)
+{
+    assert(settings.type==H5T_NATIVE_LONG);
+    _write_to_array<long>(H5T_NATIVE_LONG, pData, m, n, dataset_id);
+}
 
 
 
