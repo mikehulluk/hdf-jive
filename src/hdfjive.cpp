@@ -77,7 +77,7 @@ class _HDF5Location
 
 
 HDF5DataSet2DStd::HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet2DStdSettings& settings)
-    :name(name), settings(settings)
+    :name(name), pParent(pParent), settings(settings)
 {
 
     hsize_t data_dims[2] = {0, settings.size};
@@ -104,6 +104,11 @@ HDF5DataSet2DStd::~HDF5DataSet2DStd()
     //cout << "\nClosing DataSet:" << name  << " \n";
     H5Dclose(dataset_id);
     H5Sclose(dataspace_id);
+}
+
+std::string HDF5DataSet2DStd::get_fullname() const
+{
+    return pParent.lock()->get_fullname() + "/" + name;
 }
 
 
@@ -247,13 +252,54 @@ void HDF5DataSet2DStd::set_data(size_t m, size_t n, long* pData)
 
 
 
+void HDF5Group::add_attribute(const string& name, const string& value)
+{
+    hid_t datatype_id = H5Tcopy (H5T_C_S1);
+    H5Tset_size (datatype_id, value.size());
+
+    hid_t space=H5Screate (H5S_SCALAR);
+    //hsize_t dims[] ={value.size()};
+    //hid_t space = H5Screate_simple (1, dims, NULL);
+    hid_t attr_id = H5Acreate (group_id, name.c_str(), datatype_id, space, H5P_DEFAULT);
+    
+    const char* attrs_data = value.c_str(); //"HelloWrodl";
+    H5Awrite(attr_id, datatype_id, attrs_data);
 
 
+//    HDF5Group
+////DataSpace attr_dataspace = DataSpace(H5S_SCALAR);
+////StrType strdatatype(PredType::C_S1, 256); // of length 256 characters
+////const H5std_string strwritebuf ("This attribute is of type StrType");
+//
+//    H5Acreate_by_name( 
+//            group_id, 
+//            ".",
+//            name.c_str(),
+//            H5T_STRING,
+
+
+
+
+
+}
+
+
+std::string HDF5Group::get_fullname() const
+{
+    if(is_root())
+    {
+        return "/";
+    }
+    else
+    {
+        return pParent.lock()->get_fullname() + "/" + location;
+    }
+}
 
 
 
 HDF5Group::HDF5Group(const string& location, HDF5FilePtrWeak fileptr,  HDF5GroupPtrWeak parentptr)
-    :location(location), fileptr(fileptr)
+    :location(location), fileptr(fileptr), pParent(parentptr)
 {
 
     if( is_root() )
@@ -296,10 +342,6 @@ HDF5Group::~HDF5Group()
 
 HDF5GroupPtr HDF5Group::get_subgroup(const string& location_in)
 {
-    //cout << "\nGetting Group: " << location << "\n";
-
-
-
     _HDF5Location loc(location_in);
 
     // Sanity checks:
@@ -320,7 +362,6 @@ HDF5GroupPtr HDF5Group::get_subgroup(const string& location_in)
 
 HDF5GroupPtr HDF5Group::get_subgrouplocal(const string& location)
 {
-
     assert( location.find("/") == string::npos );
 
     // Group does not exist:
@@ -335,10 +376,11 @@ HDF5GroupPtr HDF5Group::get_subgrouplocal(const string& location)
 
 
 
-bool HDF5Group::is_root()
+bool HDF5Group::is_root() const
 {
     return this->location == "/";
 }
+
 
 
 
@@ -373,6 +415,20 @@ HDF5DataSet2DStdPtr HDF5Group::get_dataset(const string& name)
     }
 
 }
+
+
+void HDF5Group::create_softlink(const  HDF5DataSet2DStdPtr& target, const std::string& name)
+{
+    H5Lcreate_soft( 
+            target->get_fullname().c_str(), //const char *target_path, 
+            this->group_id,                 //hid_t link_loc_id, 
+            name.c_str(),                   //const char *link_name, 
+            H5P_DEFAULT,                    //hid_t lcpl_id,
+            H5P_DEFAULT                     //hid_t lapl_id 
+            );
+}
+
+
 
 
 

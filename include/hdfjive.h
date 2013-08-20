@@ -93,12 +93,15 @@ public:
 
 class HDF5DataSet2DStd : public  boost::enable_shared_from_this<HDF5DataSet2DStd>
 {
-    const string name;
     hid_t dataset_id;
     hid_t dataspace_id;
-    HDF5DataSet2DStdSettings settings;
+
 
 public:
+    const string name;
+    HDF5GroupPtrWeak pParent;
+    HDF5DataSet2DStdSettings settings;
+
     HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet2DStdSettings& settings);
     ~HDF5DataSet2DStd();
 
@@ -136,6 +139,8 @@ public:
     
 
 
+    std::string get_fullname() const;
+
 
 };
 
@@ -151,8 +156,9 @@ public:
     hid_t group_id;
 
     HDF5FilePtrWeak fileptr;
+    HDF5GroupPtrWeak pParent;
 
-    bool is_root();
+    bool is_root() const;
 
 
 
@@ -176,9 +182,12 @@ public:
     HDF5GroupPtr get_datasetlocal(const string& location);
 
     // Links:
-    //void create_hardlink(const  HDF5DataSet2DStdPtr& target);
+    void create_softlink(const  HDF5DataSet2DStdPtr& target, const std::string& name);
+    
 
 
+    std::string get_fullname() const;
+    void add_attribute(const string& name, const string& value);
 };
 
 
