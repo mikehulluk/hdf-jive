@@ -304,11 +304,11 @@ HDF5Group::HDF5Group(const string& location, HDF5FilePtrWeak fileptr,  HDF5Group
 
     if( is_root() )
     {
-        cout << "\nCreating Root Group: " << location;
+        //cout << "\nCreating Root Group: " << location;
     }
     else
     {
-        cout << "\nCreating Group: " << location;
+        //cout << "\nCreating Group: " << location;
 
         HDF5GroupPtr parent = parentptr.lock();
         if(parent->is_root() )
@@ -328,7 +328,7 @@ HDF5Group::~HDF5Group()
     datasets.clear();
     groups.clear();
 
-    cout << "\nShutting down group: " << location << "\n";
+    //cout << "\nShutting down group: " << location << "\n";
     if(!is_root())
     {
         H5Gclose(group_id);
@@ -461,11 +461,12 @@ HDF5File::HDF5File(const string& filename)
 HDF5File::~HDF5File()
 {
     cout << "\nClosing HDF file: " << filename << "\n";
-    cout << "\n - Releasing groups: ";
+    //cout << "\n - Releasing groups: ";
     root_group.reset();
 
-    cout << "\n - Releasing handle";
+    //cout << "\n - Releasing handle";
     H5Fclose(this->file_id);
+    cout << "\n(OK)" << std::flush;
 }
 
 

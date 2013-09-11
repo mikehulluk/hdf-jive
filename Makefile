@@ -17,8 +17,8 @@ $(LIBDIR):
 
 
 lib/libhdfjive.so : include/hdfjive.h src/hdfjive.cpp
-	g++ -c -g -Wall -Werror -fpic src/hdfjive.cpp -o lib/hdfjive.o -Iinclude
-	g++ -g -shared -o lib/libhdfjive.so lib/hdfjive.o
+	g++ -c -g -Wall -Werror -fpic src/hdfjive.cpp -o lib/hdfjive.o -Iinclude -O3
+	g++ -g -shared -o lib/libhdfjive.so lib/hdfjive.o -O3
 
 
 
