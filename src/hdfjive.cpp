@@ -130,7 +130,7 @@ void _append_to_array(hid_t datatype, T* pData, size_t n, hid_t dataset_id)
 
     assert(dims[1] == n);
 
-    int curr_size = dims[0];
+    hsize_t curr_size = dims[0];
 
     // Extend the table:
     hsize_t new_data_dims[2] = {curr_size+1, dims[1] };
@@ -260,7 +260,7 @@ void HDF5Group::add_attribute(const string& name, const string& value)
     hid_t space=H5Screate (H5S_SCALAR);
     //hsize_t dims[] ={value.size()};
     //hid_t space = H5Screate_simple (1, dims, NULL);
-    hid_t attr_id = H5Acreate (group_id, name.c_str(), datatype_id, space, H5P_DEFAULT);
+    hid_t attr_id = H5Acreate2(group_id, name.c_str(), datatype_id, space, H5P_DEFAULT, H5P_DEFAULT);
     
     const char* attrs_data = value.c_str(); //"HelloWrodl";
     H5Awrite(attr_id, datatype_id, attrs_data);
@@ -498,10 +498,11 @@ HDF5DataSet2DStdPtr HDF5File::get_dataset(const string& location)
 
 
 
-herr_t my_hdf5_error_handler (void *unused)
+//herr_t my_hdf5_error_handler (void *unused)
+herr_t my_hdf5_error_handler (hid_t estack_id, void *unused)
 {
    fprintf (stderr, "An HDF5 error was detected. Bye.\n");
-   H5Eprint(stderr);
+   H5Eprint2(H5E_DEFAULT, stderr);
    assert(0);
    exit (1);
 }
