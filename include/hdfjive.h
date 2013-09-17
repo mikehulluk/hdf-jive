@@ -258,7 +258,7 @@ class HDFManager
 
         HDFManager()
         {
-            H5Eset_auto(H5E_DEFAULT, my_hdf5_error_handler, NULL);
+            H5Eset_auto2(H5E_DEFAULT, my_hdf5_error_handler, NULL);
         }
         ~HDFManager()
         {
