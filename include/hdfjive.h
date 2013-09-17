@@ -20,7 +20,8 @@ using namespace std;
 
 
 // Signal Errors:
-herr_t my_hdf5_error_handler (void *unused);
+//herr_t my_hdf5_error_handler (void *unused);
+herr_t my_hdf5_error_handler (hid_t estack_id, void *unused);
 
 
 
@@ -257,7 +258,7 @@ class HDFManager
 
         HDFManager()
         {
-            H5Eset_auto (my_hdf5_error_handler, NULL);
+            H5Eset_auto(H5E_DEFAULT, my_hdf5_error_handler, NULL);
         }
         ~HDFManager()
         {
