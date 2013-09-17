@@ -86,5 +86,35 @@ class HDF5SimulationResultFile(object):
 
 
 
+    def plot(self, trace_filters, spike_filters, xlim=None):
+        import pylab
+        import mreorg
+
+        for filt in trace_filters:
+            pylab.figure(figsize=(20,16))
+            trs = self.filter_traces(filt)
+            print 'Plotting:', filt, len(trs)
+            for res in trs:
+                pylab.plot(res.raw_data.time_pts, res.raw_data.data_pts, label=','.join(res.tags), ms='x'  )
+            if xlim:
+                pylab.xlim(*xlim)
+            pylab.ylabel(filt)
+            #pylab.legend()
+            mreorg.PM.save_active_figures()
+
+
+        for filt in spike_filters:
+            pylab.figure(figsize=(20,16))
+            trs = self.filter_events(filt)
+            print 'Plotting:', filt, len(trs)
+            for i,res in enumerate(trs):
+                evt_times = res.evt_times
+                pylab.plot( evt_times, i+ 0*evt_times, 'x', label=','.join(res.tags))
+            if xlim:
+                pylab.xlim(*xlim)
+            pylab.ylabel(filt)
+            #pylab.legend()
+            mreorg.PM.save_active_figures()
+
 
 
