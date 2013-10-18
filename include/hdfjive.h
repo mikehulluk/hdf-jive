@@ -1,13 +1,6 @@
 
-
-
-
-
 #include "hdf5.h"
 #include <hdf5_hl.h>
-
-
-
 
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
@@ -132,17 +125,12 @@ public:
         append_buffer(&value);
     }
 
-
     void set_data(size_t m, size_t n, double* pData);
     void set_data(size_t m, size_t n, float* pData);
     void set_data(size_t m, size_t n, int* pData);
     void set_data(size_t m, size_t n, long* pData);
-    
-
 
     std::string get_fullname() const;
-
-
 };
 
 
@@ -160,8 +148,6 @@ public:
     HDF5GroupPtrWeak pParent;
 
     bool is_root() const;
-
-
 
 
 public:
@@ -185,8 +171,6 @@ public:
     // Links:
     void create_softlink(const  HDF5DataSet2DStdPtr& target, const std::string& name);
     
-
-
     std::string get_fullname() const;
     void add_attribute(const string& name, const string& value);
 };
@@ -292,13 +276,4 @@ class HDFManager
     {
 
     }
-
-
 };
-
-
-
-
-
-
-

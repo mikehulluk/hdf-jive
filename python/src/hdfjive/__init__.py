@@ -86,20 +86,33 @@ class HDF5SimulationResultFile(object):
 
 
 
-    def plot(self, trace_filters, spike_filters, xlim=None):
+    def plot(self, trace_filters=None, spike_filters=None, xlim=None, legend=False):
         import pylab
         import mreorg
+        import numpy as np
+
+        trace_filters = trace_filters or []
+        spike_filters = spike_filters or []
 
         for filt in trace_filters:
             pylab.figure(figsize=(20,16))
             trs = self.filter_traces(filt)
             print 'Plotting:', filt, len(trs)
             for res in trs:
-                pylab.plot(res.raw_data.time_pts, res.raw_data.data_pts, label=','.join(res.tags), ms='x'  )
-            if xlim:
-                pylab.xlim(*xlim)
+                if xlim:
+                    time_mask = np.logical_and(
+                                    res.raw_data.time_pts>xlim[0],
+                                    res.raw_data.time_pts<xlim[1],
+                            )
+                    time, data = res.raw_data.time_pts[time_mask], res.raw_data.data_pts[time_mask]
+                else:
+                    time, data = res.raw_data.time_pts, res.raw_data.data_pts
+                pylab.plot(time, data,'x-', label=','.join(res.tags), ms=2 )
+            #if xlim:
+            #    pylab.xlim(*xlim)
             pylab.ylabel(filt)
-            #pylab.legend()
+            if legend:
+                pylab.legend()
             mreorg.PM.save_active_figures()
 
 
@@ -113,6 +126,8 @@ class HDF5SimulationResultFile(object):
             if xlim:
                 pylab.xlim(*xlim)
             pylab.ylabel(filt)
+            if legend:
+                pylab.legend()
             #pylab.legend()
             mreorg.PM.save_active_figures()
 

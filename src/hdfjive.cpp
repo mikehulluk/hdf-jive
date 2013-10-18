@@ -2,22 +2,6 @@
 #include "hdfjive.h"
 
 
-
-
-
-//#include <boost/log/core.hpp>
-//#include <boost/log/trivial.hpp>
-//#include <boost/log/expressions.hpp>
-
-
-
-
-
-
-
-
-
-
 class _HDF5Location
 {
     string location;
@@ -118,10 +102,7 @@ std::string HDF5DataSet2DStd::get_fullname() const
 template<typename T>
 void _append_to_array(hid_t datatype, T* pData, size_t n, hid_t dataset_id)
 {
-    //cout << "\nWriting: ";
-    //for(size_t i=0;i<n;i++) cout << pData[i] << ", ";
-
-
+ 
     // How big is the array:?
     hsize_t dims[2], max_dims[2];
     hid_t dataspace = H5Dget_space(dataset_id);
@@ -258,29 +239,10 @@ void HDF5Group::add_attribute(const string& name, const string& value)
     H5Tset_size (datatype_id, value.size());
 
     hid_t space=H5Screate (H5S_SCALAR);
-    //hsize_t dims[] ={value.size()};
-    //hid_t space = H5Screate_simple (1, dims, NULL);
     hid_t attr_id = H5Acreate2(group_id, name.c_str(), datatype_id, space, H5P_DEFAULT, H5P_DEFAULT);
     
-    const char* attrs_data = value.c_str(); //"HelloWrodl";
+    const char* attrs_data = value.c_str(); 
     H5Awrite(attr_id, datatype_id, attrs_data);
-
-
-//    HDF5Group
-////DataSpace attr_dataspace = DataSpace(H5S_SCALAR);
-////StrType strdatatype(PredType::C_S1, 256); // of length 256 characters
-////const H5std_string strwritebuf ("This attribute is of type StrType");
-//
-//    H5Acreate_by_name( 
-//            group_id, 
-//            ".",
-//            name.c_str(),
-//            H5T_STRING,
-
-
-
-
-
 }
 
 
