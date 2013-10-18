@@ -17,9 +17,6 @@ using namespace std;
 herr_t my_hdf5_error_handler (hid_t estack_id, void *unused);
 
 
-
-
-
 // Forward declarations:
 class HDF5Group;
 class HDF5File;
@@ -32,8 +29,6 @@ typedef boost::shared_ptr<HDF5Group> HDF5GroupPtr;
 typedef boost::weak_ptr<HDF5Group> HDF5GroupPtrWeak;
 
 typedef boost::shared_ptr<HDF5DataSet2DStd> HDF5DataSet2DStdPtr;
-
-
 
 
 
@@ -98,14 +93,11 @@ public:
     HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet2DStdSettings& settings);
     ~HDF5DataSet2DStd();
 
-
     // For the different datatypes:
     void append_buffer( float* pData );
     void append_buffer( double* pData );
     void append_buffer( int* pData );
     void append_buffer( long* pData );
-
-
 
     // Convience methods:
     // ///////////////////////////
@@ -139,6 +131,8 @@ public:
 
 class HDF5Group : public boost::enable_shared_from_this<HDF5Group>
 {
+    //HDF5GroupPtr get_dataset2D_local(const string& location);
+
 public:
     const string location;
     hid_t group_id;
@@ -165,7 +159,6 @@ public:
     DatasetPtrMap datasets;
     HDF5DataSet2DStdPtr create_dataset2D(const string& name, const HDF5DataSet2DStdSettings& settings);
     HDF5DataSet2DStdPtr get_dataset2D(const string& name);
-    HDF5GroupPtr get_datasetlocal(const string& location);
 
     // Links:
     void create_softlink(const  HDF5DataSet2DStdPtr& target, const std::string& name);
