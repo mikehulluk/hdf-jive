@@ -87,6 +87,7 @@ public:
 
 
 
+
 class HDF5DataSet2DStd : public  boost::enable_shared_from_this<HDF5DataSet2DStd>
 {
     hid_t dataset_id;
@@ -132,6 +133,81 @@ public:
 
     std::string get_fullname() const;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class HDF5DataSet1DStdSettings
+{
+public:
+    
+    const hid_t type; // H5T_NATIVE_CHAR, H5T_NATIVE_SHORT, H5T_NATIVE_INT, H5T_NATIVE_LONG, H5T_NATIVE_FLOAT
+    HDF5DataSet1DStdSettings(hid_t type)
+        : type(type) {}
+};
+
+
+
+
+
+
+
+class HDF5DataSet1DStd : public  boost::enable_shared_from_this<HDF5DataSet1DStd>
+{
+    hid_t dataset_id;
+    hid_t dataspace_id;
+
+public:
+    const string name;
+    HDF5GroupPtrWeak pParent;
+    HDF5DataSet1DStdSettings settings;
+
+    HDF5DataSet1DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet1DStdSettings& settings);
+    ~HDF5DataSet1DStd();
+
+  
+    // Single values:
+    
+    void append(int value);
+    void append(long value);
+    void append(float value);
+    void append(double value);
+    
+
+    void set_data(size_t n, const double* pData);
+    void set_data(size_t n, const float* pData);
+    void set_data(size_t n, const int* pData);
+    void set_data(size_t n, const long* pData);
+    
+    std::string get_fullname() const;
+};
+
+
+
+
+
+
+
+
 
 
 
