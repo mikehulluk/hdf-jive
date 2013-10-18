@@ -349,7 +349,7 @@ bool HDF5Group::is_root() const
 
 
 
-HDF5DataSet2DStdPtr HDF5Group::create_dataset(const string& name, const HDF5DataSet2DStdSettings& settings)
+HDF5DataSet2DStdPtr HDF5Group::create_dataset2D(const string& name, const HDF5DataSet2DStdSettings& settings)
 {
     assert( datasets.find(name) == datasets.end() );
 
@@ -359,7 +359,7 @@ HDF5DataSet2DStdPtr HDF5Group::create_dataset(const string& name, const HDF5Data
 }
 
 
-HDF5DataSet2DStdPtr HDF5Group::get_dataset(const string& name)
+HDF5DataSet2DStdPtr HDF5Group::get_dataset2D(const string& name)
 {
     _HDF5Location loc(name);
     // Sanity checks:
@@ -373,7 +373,7 @@ HDF5DataSet2DStdPtr HDF5Group::get_dataset(const string& name)
     }
     else
     {
-        return this->get_subgrouplocal(loc.get_local_path())->get_dataset(loc.get_child_path());
+        return this->get_subgrouplocal(loc.get_local_path())->get_dataset2D(loc.get_child_path());
     }
 
 }
@@ -445,14 +445,14 @@ HDF5GroupPtr HDF5File::get_group(const string& location)
 }
 
 
-HDF5DataSet2DStdPtr HDF5File::get_dataset(const string& location)
+HDF5DataSet2DStdPtr HDF5File::get_dataset2D(const string& location)
 {
     if(!root_group)
     {
         init();
     }
 
-    return this->root_group->get_dataset(location);
+    return this->root_group->get_dataset2D(location);
 }
 
 

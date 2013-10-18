@@ -79,7 +79,6 @@ public:
     const hid_t type; // H5T_NATIVE_CHAR, H5T_NATIVE_SHORT, H5T_NATIVE_INT, H5T_NATIVE_LONG, H5T_NATIVE_FLOAT
     HDF5DataSet2DStdSettings(size_t size, hid_t type)
         : size(size), type(type) {}
-
 };
 
 
@@ -164,8 +163,8 @@ public:
     // Datasets:
     typedef map<const string, HDF5DataSet2DStdPtr> DatasetPtrMap;
     DatasetPtrMap datasets;
-    HDF5DataSet2DStdPtr create_dataset(const string& name, const HDF5DataSet2DStdSettings& settings);
-    HDF5DataSet2DStdPtr get_dataset(const string& name);
+    HDF5DataSet2DStdPtr create_dataset2D(const string& name, const HDF5DataSet2DStdSettings& settings);
+    HDF5DataSet2DStdPtr get_dataset2D(const string& name);
     HDF5GroupPtr get_datasetlocal(const string& location);
 
     // Links:
@@ -202,7 +201,7 @@ public:
 
 
     HDF5GroupPtr get_group(const string& location);
-    HDF5DataSet2DStdPtr get_dataset(const string& location);
+    HDF5DataSet2DStdPtr get_dataset2D(const string& location);
 };
 
 
