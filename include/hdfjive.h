@@ -46,11 +46,10 @@ public:
 
     DataBuffer( ) {}
 
-    // Should be rewritten!
+    // From pointers:
     DataBuffer( const T* data, size_t size)
-    {
-        for(size_t i=0;i<size;i++) _data.push_back(data[i]);
-    }
+    : _data(data, data+size)
+    {}
 
 };
 
@@ -107,6 +106,7 @@ public:
     ~HDF5DataSet2DStd();
 
     // For the different datatypes:
+    // The pointer should point to a block of memory  of length settings.size
     void append_buffer( const float* pData );
     void append_buffer( const double* pData );
     void append_buffer( const int* pData );
@@ -143,6 +143,14 @@ public:
 
 
 
+
+
+
+
+
+
+
+
 class HDF5Group : public boost::enable_shared_from_this<HDF5Group>
 {
 
@@ -173,7 +181,7 @@ public:
     // Datasets:
     typedef map<const string, HDF5DataSet2DStdPtr> Dataset2DPtrMap;
     Dataset2DPtrMap datasets_2d;
-    HDF5DataSet2DStdPtr create_dataset2D(const string& name, const HDF5DataSet2DStdSettings& settings);
+    HDF5DataSet2DStdPtr create_empty_dataset2D(const string& name, const HDF5DataSet2DStdSettings& settings);
     HDF5DataSet2DStdPtr get_dataset2D(const string& name);
 
     // Links:

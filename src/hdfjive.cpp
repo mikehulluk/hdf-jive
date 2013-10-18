@@ -163,22 +163,9 @@ template<typename T>
 void _write_to_array(hid_t datatype, const T* pData, size_t M, size_t N, hid_t dataset_id)
 {
 
-    // How big is the array:?
-    //hsize_t dims[2], max_dims[2];
-    //hid_t dataspace = H5Dget_space(dataset_id);
-    //H5Sget_simple_extent_dims(dataspace, dims, max_dims);
-    //H5Sclose(dataspace);
-
-    //assert(dims[1] == N);
-
-    //int curr_size = dims[0];
-
     // Extend the table:
-    hsize_t new_data_dims[2] = {M,N}; //curr_size+1, dims[1] };
+    hsize_t new_data_dims[2] = {M,N}; 
     H5Dextend (dataset_id, new_data_dims);
-
-    //cout << "\n   - New dimension: " << curr_size+1;
-
     // And copy:
     hid_t filespace = H5Dget_space(dataset_id);
     hsize_t offset[2] = {0, 0};
@@ -197,13 +184,8 @@ void _write_to_array(hid_t datatype, const T* pData, size_t M, size_t N, hid_t d
 
 void HDF5DataSet2DStd::set_data(size_t m, size_t n, const float* pData)
 {
-    //cout << "\nm:" << m;
-    //cout << "\nsettings.size:" << settings.size;
-    //cout << "\n";
-    
     assert(settings.type==H5T_NATIVE_FLOAT);
     assert(n==settings.size);
-    //cout << "\nm:" << m;
     _write_to_array<float>(H5T_NATIVE_FLOAT, pData, m, n, dataset_id);
 }
 
@@ -211,16 +193,19 @@ void HDF5DataSet2DStd::set_data(size_t m, size_t n, const float* pData)
 void HDF5DataSet2DStd::set_data(size_t m, size_t n, const double* pData)
 {
     assert(settings.type==H5T_NATIVE_DOUBLE);
+    assert(n==settings.size);
     _write_to_array<double>(H5T_NATIVE_DOUBLE, pData, m, n, dataset_id);
 }
 void HDF5DataSet2DStd::set_data(size_t m, size_t n, const int* pData)
 {
     assert(settings.type==H5T_NATIVE_INT);
+    assert(n==settings.size);
     _write_to_array<int>(H5T_NATIVE_INT, pData, m, n, dataset_id);
 }
 void HDF5DataSet2DStd::set_data(size_t m, size_t n, const long* pData)
 {
     assert(settings.type==H5T_NATIVE_LONG);
+    assert(n==settings.size);
     _write_to_array<long>(H5T_NATIVE_LONG, pData, m, n, dataset_id);
 }
 
@@ -349,7 +334,7 @@ bool HDF5Group::is_root() const
 
 
 
-HDF5DataSet2DStdPtr HDF5Group::create_dataset2D(const string& name, const HDF5DataSet2DStdSettings& settings)
+HDF5DataSet2DStdPtr HDF5Group::create_empty_dataset2D(const string& name, const HDF5DataSet2DStdSettings& settings)
 {
     assert( datasets_2d.find(name) == datasets_2d.end() );
 

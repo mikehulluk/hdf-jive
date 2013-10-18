@@ -50,7 +50,8 @@ public:
 
     SharedTimeBufferPtr write_shared_time_buffer(const FloatBuffer& b);
     void write_trace( const std::string populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, const FloatBuffer& data, const TagList& tags );
-    void write_outputspikes( const std::string populationname, int index, const std::string& record_name, const FloatBuffer& times, const TagList& tags );
+    void write_outputevents( const std::string populationname, int index, const std::string& record_name, const FloatBuffer& times, const TagList& tags );
+    void write_inputevents( const std::string populationname, int index, const std::string& record_name, const FloatBuffer& times, const TagList& tags );
 
 };
 
