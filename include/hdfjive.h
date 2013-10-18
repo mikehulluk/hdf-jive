@@ -41,8 +41,20 @@ public:
     vector<T> _data;
 
     inline T* get_data_pointer() {  return &(this->_data[0]); }
-    inline size_t size() { return this->_data.size(); }
+    inline const T* get_data_pointer() const {  return &(this->_data[0]); }
+    inline size_t size() const { return this->_data.size(); }
+
+    DataBuffer( ) {}
+
+    // Should be rewritten!
+    DataBuffer( const T* data, size_t size)
+    {
+        for(size_t i=0;i<size;i++) _data.push_back(data[i]);
+    }
+
 };
+
+
 
 template<typename TYPE>
 DataBuffer<TYPE> operator|(DataBuffer<TYPE> buff, TYPE data)
@@ -79,11 +91,12 @@ public:
 
 
 
+
+
 class HDF5DataSet2DStd : public  boost::enable_shared_from_this<HDF5DataSet2DStd>
 {
     hid_t dataset_id;
     hid_t dataspace_id;
-
 
 public:
     const string name;
@@ -94,10 +107,10 @@ public:
     ~HDF5DataSet2DStd();
 
     // For the different datatypes:
-    void append_buffer( float* pData );
-    void append_buffer( double* pData );
-    void append_buffer( int* pData );
-    void append_buffer( long* pData );
+    void append_buffer( const float* pData );
+    void append_buffer( const double* pData );
+    void append_buffer( const int* pData );
+    void append_buffer( const long* pData );
 
     // Convience methods:
     // ///////////////////////////
@@ -116,10 +129,11 @@ public:
         append_buffer(&value);
     }
 
-    void set_data(size_t m, size_t n, double* pData);
-    void set_data(size_t m, size_t n, float* pData);
-    void set_data(size_t m, size_t n, int* pData);
-    void set_data(size_t m, size_t n, long* pData);
+    void set_data(size_t m, size_t n, const double* pData);
+    void set_data(size_t m, size_t n, const float* pData);
+    void set_data(size_t m, size_t n, const int* pData);
+    void set_data(size_t m, size_t n, const long* pData);
+    
 
     std::string get_fullname() const;
 };
@@ -131,7 +145,6 @@ public:
 
 class HDF5Group : public boost::enable_shared_from_this<HDF5Group>
 {
-    //HDF5GroupPtr get_dataset2D_local(const string& location);
 
 public:
     const string location;
@@ -150,13 +163,16 @@ public:
     typedef map<const string, HDF5GroupPtr> GroupPtrMap;
     GroupPtrMap groups;
 
+
+    inline HDF5GroupPtr get_group(const string& location) { return get_subgroup(location); }
+
     // Subgroups:
     HDF5GroupPtr get_subgroup(const string& location);
     HDF5GroupPtr get_subgrouplocal(const string& location);
 
     // Datasets:
-    typedef map<const string, HDF5DataSet2DStdPtr> DatasetPtrMap;
-    DatasetPtrMap datasets;
+    typedef map<const string, HDF5DataSet2DStdPtr> Dataset2DPtrMap;
+    Dataset2DPtrMap datasets_2d;
     HDF5DataSet2DStdPtr create_dataset2D(const string& name, const HDF5DataSet2DStdSettings& settings);
     HDF5DataSet2DStdPtr get_dataset2D(const string& name);
 

@@ -16,9 +16,10 @@ $(LIBDIR):
 	mkdir -p $(LIBDIR)
 
 
-lib/libhdfjive.so : include/hdfjive.h src/hdfjive.cpp
-	g++ -c -g -Wall -Werror -fpic src/hdfjive.cpp -o lib/hdfjive.o -Iinclude -O3
-	g++ -g -shared -o lib/libhdfjive.so lib/hdfjive.o -O3
+lib/libhdfjive.so : include/hdfjive.h src/hdfjive.cpp include/hdfjive-neuro.h src/hdfjive-neuro.cpp
+	g++ -c -g -Wall -Werror -fpic src/hdfjive.cpp   -o lib/hdfjive.o -Iinclude -O3
+	g++ -c -g -Wall -Werror -fpic src/hdfjive-neuro.cpp   -o lib/hdfjive-neuro.o -Iinclude -O3
+	g++ -g -shared -o lib/libhdfjive.so lib/hdfjive.o  lib/hdfjive-neuro.o  -O3
 
 
 

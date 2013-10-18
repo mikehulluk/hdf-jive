@@ -74,10 +74,7 @@ HDF5DataSet2DStd::HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent
 
 
     dataset_id = H5Dcreate2 (pParent.lock()->group_id, name.c_str(), settings.type, dataspace_id, H5P_DEFAULT, prop, H5P_DEFAULT);
-
-
     H5Pclose (prop);
-
 }
 
 
@@ -85,7 +82,6 @@ HDF5DataSet2DStd::HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent
 
 HDF5DataSet2DStd::~HDF5DataSet2DStd()
 {
-    //cout << "\nClosing DataSet:" << name  << " \n";
     H5Dclose(dataset_id);
     H5Sclose(dataspace_id);
 }
@@ -100,7 +96,7 @@ std::string HDF5DataSet2DStd::get_fullname() const
 
 
 template<typename T>
-void _append_to_array(hid_t datatype, T* pData, size_t n, hid_t dataset_id)
+void _append_to_array(hid_t datatype, const T* pData, size_t n, hid_t dataset_id)
 {
  
     // How big is the array:?
@@ -116,8 +112,6 @@ void _append_to_array(hid_t datatype, T* pData, size_t n, hid_t dataset_id)
     // Extend the table:
     hsize_t new_data_dims[2] = {curr_size+1, dims[1] };
     H5Dextend (dataset_id, new_data_dims);
-
-    //cout << "\n   - New dimension: " << curr_size+1;
 
     // And copy:
     hid_t filespace = H5Dget_space(dataset_id);
@@ -136,26 +130,26 @@ void _append_to_array(hid_t datatype, T* pData, size_t n, hid_t dataset_id)
 
 
 
-void HDF5DataSet2DStd::append_buffer( float* pData )
+void HDF5DataSet2DStd::append_buffer( const float* pData )
 {
     assert(settings.type==H5T_NATIVE_FLOAT);
     _append_to_array<float>(H5T_NATIVE_FLOAT, pData, settings.size, dataset_id);
 }
 
 
-void HDF5DataSet2DStd::append_buffer( double* pData )
+void HDF5DataSet2DStd::append_buffer( const double* pData )
 {
     assert(settings.type==H5T_NATIVE_DOUBLE);
     _append_to_array<double>(H5T_NATIVE_DOUBLE, pData, settings.size, dataset_id);
 }
 
-void HDF5DataSet2DStd::append_buffer( int* pData )
+void HDF5DataSet2DStd::append_buffer( const int* pData )
 {
     assert(settings.type==H5T_NATIVE_INT);
     _append_to_array<int>(H5T_NATIVE_INT, pData, settings.size, dataset_id);
 }
 
-void HDF5DataSet2DStd::append_buffer( long* pData )
+void HDF5DataSet2DStd::append_buffer( const long* pData )
 {
     assert(settings.type==H5T_NATIVE_FLOAT);
     _append_to_array<long>(H5T_NATIVE_LONG, pData, settings.size, dataset_id);
@@ -166,7 +160,7 @@ void HDF5DataSet2DStd::append_buffer( long* pData )
 
 
 template<typename T>
-void _write_to_array(hid_t datatype, T* pData, size_t M, size_t N, hid_t dataset_id)
+void _write_to_array(hid_t datatype, const T* pData, size_t M, size_t N, hid_t dataset_id)
 {
 
     // How big is the array:?
@@ -201,23 +195,30 @@ void _write_to_array(hid_t datatype, T* pData, size_t M, size_t N, hid_t dataset
 }
 
 
-void HDF5DataSet2DStd::set_data(size_t m, size_t n, float* pData)
+void HDF5DataSet2DStd::set_data(size_t m, size_t n, const float* pData)
 {
+    //cout << "\nm:" << m;
+    //cout << "\nsettings.size:" << settings.size;
+    //cout << "\n";
+    
     assert(settings.type==H5T_NATIVE_FLOAT);
-    assert(m==settings.size);
+    assert(n==settings.size);
+    //cout << "\nm:" << m;
     _write_to_array<float>(H5T_NATIVE_FLOAT, pData, m, n, dataset_id);
 }
-void HDF5DataSet2DStd::set_data(size_t m, size_t n, double* pData)
+
+
+void HDF5DataSet2DStd::set_data(size_t m, size_t n, const double* pData)
 {
     assert(settings.type==H5T_NATIVE_DOUBLE);
     _write_to_array<double>(H5T_NATIVE_DOUBLE, pData, m, n, dataset_id);
 }
-void HDF5DataSet2DStd::set_data(size_t m, size_t n, int* pData)
+void HDF5DataSet2DStd::set_data(size_t m, size_t n, const int* pData)
 {
     assert(settings.type==H5T_NATIVE_INT);
     _write_to_array<int>(H5T_NATIVE_INT, pData, m, n, dataset_id);
 }
-void HDF5DataSet2DStd::set_data(size_t m, size_t n, long* pData)
+void HDF5DataSet2DStd::set_data(size_t m, size_t n, const long* pData)
 {
     assert(settings.type==H5T_NATIVE_LONG);
     _write_to_array<long>(H5T_NATIVE_LONG, pData, m, n, dataset_id);
@@ -287,10 +288,9 @@ HDF5Group::HDF5Group(const string& location, HDF5FilePtrWeak fileptr,  HDF5Group
 
 HDF5Group::~HDF5Group()
 {
-    datasets.clear();
+    datasets_2d.clear();
     groups.clear();
 
-    //cout << "\nShutting down group: " << location << "\n";
     if(!is_root())
     {
         H5Gclose(group_id);
@@ -351,10 +351,10 @@ bool HDF5Group::is_root() const
 
 HDF5DataSet2DStdPtr HDF5Group::create_dataset2D(const string& name, const HDF5DataSet2DStdSettings& settings)
 {
-    assert( datasets.find(name) == datasets.end() );
+    assert( datasets_2d.find(name) == datasets_2d.end() );
 
-    datasets[name] = HDF5DataSet2DStdPtr( new HDF5DataSet2DStd(name, HDF5GroupPtrWeak(shared_from_this()), settings ) );
-    return datasets[name];
+    datasets_2d[name] = HDF5DataSet2DStdPtr( new HDF5DataSet2DStd(name, HDF5GroupPtrWeak(shared_from_this()), settings ) );
+    return datasets_2d[name];
 
 }
 
@@ -368,8 +368,8 @@ HDF5DataSet2DStdPtr HDF5Group::get_dataset2D(const string& name)
 
     if(loc.is_local())
     {
-        assert( datasets.find(loc.get_local_path()) != datasets.end() );
-        return datasets[loc.get_local_path()];
+        assert( datasets_2d.find(loc.get_local_path()) != datasets_2d.end() );
+        return datasets_2d[loc.get_local_path()];
     }
     else
     {
