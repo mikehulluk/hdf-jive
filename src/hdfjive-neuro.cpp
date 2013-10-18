@@ -1,4 +1,4 @@
-make
+
 #include "hdfjive.h"
 #include "hdfjive-neuro.h"
 

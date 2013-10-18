@@ -44,29 +44,24 @@ public:
     inline const T* get_data_pointer() const {  return &(this->_data[0]); }
     inline size_t size() const { return this->_data.size(); }
 
+    inline void push(const T& o){ _data.push_back(o); }
+
     DataBuffer1D( ) {}
 
-    // From pointers:
-    DataBuffer1D( const T* data, size_t size)
-    : _data(data, data+size)
-    {}
+    // Initialise from pointers:
+    DataBuffer1D( const T* data, size_t size) : _data(data, data+size)  {}
+
 
 };
 
 
 
-template<typename TYPE>
-DataBuffer1D<TYPE>& operator|(DataBuffer1D<TYPE> buff, TYPE data)
-{
-    buff._data.push_back(data);
-    return buff;
-}
-
 // Types of buffers:
 typedef DataBuffer1D<float> FloatBuffer1D;
-typedef FloatBuffer1D FB;
+typedef DataBuffer1D<int> IntBuffer1D;
 
-typedef DataBuffer1D<int> IntBuffer;
+// Synaptic sugar:
+typedef FloatBuffer1D FB;
 typedef IntBuffer1D IB;
 
 
@@ -120,10 +115,10 @@ public:
         assert(fb.size() == this->settings.size);
         this->append_buffer(fb.get_data_pointer() );
     }
-
+   
     // Single values:
     template<typename TYPE>
-    inline void append( TYPE value)
+    inline void append_single( TYPE value)
     {
         assert(settings.size==1); 
         append_buffer(&value);
