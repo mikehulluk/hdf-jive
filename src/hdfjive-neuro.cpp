@@ -1,4 +1,4 @@
-
+make
 #include "hdfjive.h"
 #include "hdfjive-neuro.h"
 
@@ -11,7 +11,7 @@ SimulationResults::SimulationResults(HDF5FilePtr file, const std::string& simula
 {
 }
 
-SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(const FloatBuffer& b)
+SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(const FloatBuffer1D& b)
 {
     const std::string& array_name = (boost::format("time_array%01d")%n_shared_time_buffers++).str();
     HDF5DataSet2DStdPtr pDataSet = pSimulationGroup->get_group("shared_time_arrays")->create_empty_dataset2D(array_name, HDF5DataSet2DStdSettings(1, H5T_NATIVE_FLOAT) );
@@ -20,7 +20,7 @@ SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(const FloatBuffe
     return SharedTimeBufferPtr(new SharedTimeBuffer(pDataSet) );
 }
 
-void SimulationResults::write_trace( const std::string populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, const FloatBuffer& data, const TagList& tags )
+void SimulationResults::write_trace( const std::string populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, const FloatBuffer1D& data, const TagList& tags )
 {
     HDF5GroupPtr pNodeGroup = pSimulationGroup
         ->get_group(populationname)
@@ -49,7 +49,7 @@ void SimulationResults::write_trace( const std::string populationname, int index
 
                 
 
-void SimulationResults::write_outputevents( const std::string populationname, int index, const std::string& record_name, const FloatBuffer& times, const TagList& tags )
+void SimulationResults::write_outputevents( const std::string populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags )
 {
     HDF5GroupPtr pGroup = pSimulationGroup
         ->get_group(populationname)
@@ -67,7 +67,7 @@ void SimulationResults::write_outputevents( const std::string populationname, in
 }
 
 
-void SimulationResults::write_inputevents( const std::string populationname, int index, const std::string& record_name, const FloatBuffer& times, const TagList& tags )
+void SimulationResults::write_inputevents( const std::string populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags )
 {
     HDF5GroupPtr pGroup = pSimulationGroup
         ->get_group(populationname)

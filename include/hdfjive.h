@@ -35,7 +35,7 @@ typedef boost::shared_ptr<HDF5DataSet2DStd> HDF5DataSet2DStdPtr;
 
 
 template< typename T>
-class DataBuffer
+class DataBuffer1D
 {
 public:
     vector<T> _data;
@@ -44,10 +44,10 @@ public:
     inline const T* get_data_pointer() const {  return &(this->_data[0]); }
     inline size_t size() const { return this->_data.size(); }
 
-    DataBuffer( ) {}
+    DataBuffer1D( ) {}
 
     // From pointers:
-    DataBuffer( const T* data, size_t size)
+    DataBuffer1D( const T* data, size_t size)
     : _data(data, data+size)
     {}
 
@@ -56,18 +56,18 @@ public:
 
 
 template<typename TYPE>
-DataBuffer<TYPE> operator|(DataBuffer<TYPE> buff, TYPE data)
+DataBuffer1D<TYPE>& operator|(DataBuffer1D<TYPE> buff, TYPE data)
 {
     buff._data.push_back(data);
     return buff;
 }
 
 // Types of buffers:
-typedef DataBuffer<float> FloatBuffer;
-typedef FloatBuffer FB;
+typedef DataBuffer1D<float> FloatBuffer1D;
+typedef FloatBuffer1D FB;
 
-typedef DataBuffer<int> IntBuffer;
-typedef FloatBuffer IB;
+typedef DataBuffer1D<int> IntBuffer;
+typedef IntBuffer1D IB;
 
 
 
@@ -115,7 +115,7 @@ public:
     // Convience methods:
     // ///////////////////////////
     template<typename TYPE>
-    inline void append_buffer( DataBuffer<TYPE> fb )
+    inline void append_buffer( DataBuffer1D<TYPE> fb )
     {
         assert(fb.size() == this->settings.size);
         this->append_buffer(fb.get_data_pointer() );

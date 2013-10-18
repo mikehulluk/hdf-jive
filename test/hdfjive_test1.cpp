@@ -14,10 +14,10 @@ using namespace boost::assign;
 void test_neuro_interface()
 {
     float time_data[] = {-1,-2,-3,-4} ;
-    FloatBuffer time_buff(time_data, 4);
+    FloatBuffer1D time_buff(time_data, 4);
     
     float v0_data[] = {2.4, .3,4, 4.6, 9.6} ;
-    FloatBuffer v0_buff(v0_data, 4);
+    FloatBuffer1D v0_buff(v0_data, 4);
 
     const list<string> tags1 = list_of("A1")("B1")("C1");
     const list<string> tags2 = list_of("A2")("B2")("C2");

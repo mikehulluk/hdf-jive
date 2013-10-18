@@ -48,10 +48,10 @@ class SimulationResults
 public:
     SimulationResults(HDF5FilePtr , const std::string& simulationname);
 
-    SharedTimeBufferPtr write_shared_time_buffer(const FloatBuffer& b);
-    void write_trace( const std::string populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, const FloatBuffer& data, const TagList& tags );
-    void write_outputevents( const std::string populationname, int index, const std::string& record_name, const FloatBuffer& times, const TagList& tags );
-    void write_inputevents( const std::string populationname, int index, const std::string& record_name, const FloatBuffer& times, const TagList& tags );
+    SharedTimeBufferPtr write_shared_time_buffer(const FloatBuffer1D& b);
+    void write_trace( const std::string populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, const FloatBuffer1D& data, const TagList& tags );
+    void write_outputevents( const std::string populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags );
+    void write_inputevents( const std::string populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags );
 
 };
 
