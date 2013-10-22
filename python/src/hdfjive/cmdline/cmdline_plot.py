@@ -1,4 +1,5 @@
 
+import pylab
 import hdfjive
 
 
@@ -22,6 +23,6 @@ def _run_plot(args):
     hdffile = hdfjive.HDF5SimulationResultFile(args.filename)
     hdffile.plot(trace_filters = args.tagstrings)
 
-
+    pylab.show()
 
     
