@@ -108,8 +108,7 @@ class HDF5SimulationResultFile(object):
                 else:
                     time, data = res.raw_data.time_pts, res.raw_data.data_pts
                 pylab.plot(time, data,'x-', label=','.join(res.tags), ms=2 )
-            #if xlim:
-            #    pylab.xlim(*xlim)
+
             pylab.ylabel(filt)
             if legend:
                 pylab.legend()
@@ -119,7 +118,7 @@ class HDF5SimulationResultFile(object):
         for filt in spike_filters:
             pylab.figure(figsize=(20,16))
             trs = self.filter_events(filt)
-            print 'Plotting:', filt, len(trs)
+            print ' -- plotting:', filt, len(trs)
             for i,res in enumerate(trs):
                 evt_times = res.evt_times
                 pylab.plot( evt_times, i+ 0*evt_times, 'x', label=','.join(res.tags))
@@ -128,7 +127,6 @@ class HDF5SimulationResultFile(object):
             pylab.ylabel(filt)
             if legend:
                 pylab.legend()
-            #pylab.legend()
             mreorg.PM.save_active_figures()
 
 

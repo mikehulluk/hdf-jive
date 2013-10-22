@@ -54,7 +54,7 @@ void SimulationResults::write_trace( const std::string& populationname, int inde
     
     // Add the tags to the node-group:
     pNodeGroup->add_attribute("hdf-jive", "trace");
-    if(tags.size() != 0) pNodeGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
+    if(tags.size() != 0) pNodeGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ","));
     
     // Soft-link the time:
     pDataGroup->create_softlink(times->pArray, "time");
