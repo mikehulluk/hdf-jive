@@ -19,10 +19,8 @@ void test_neuro_interface()
     float v0_data[] = {2.4, .3,4, 4.6, 9.6} ;
     FloatBuffer1D v0_buff(v0_data, 4);
 
-    const list<string> tags1 = list_of("A1")("B1")("C1");
-    const list<string> tags2 = list_of("A2")("B2")("C2");
-    const list<string> tags3 = list_of("A3")("B3")("C3");
-
+    //const list<string> tags2 = list_of("A2")("B2")("C2");
+    //const list<string> tags3 = 
 
     
     SimulationResultsPtr output = SimulationResultsFile("MyResults.hdf").Simulation("Sim1");
@@ -30,9 +28,9 @@ void test_neuro_interface()
 
     for(int i=0;i<5;i++)
     {
-        output->write_trace("population-dINs-RHS", 78+i, "V", times, v0_buff, tags1);
-        output->write_inputevents("population-dINs-RHS", 78+i, "spike_in",   FB( list_of(45.f)(25.f).to_adapter()), tags2);
-        output->write_outputevents("population-dINs-RHS", 78+i, "spike_out", FB( list_of(200.f)(23.f).to_adapter()), tags3);
+        output->write_trace("population-dINs-RHS", 78+i, "V", times, v0_buff, list_of("A1")("B1")("C1") );
+        //output->write_inputevents("population-dINs-RHS", 78+i, "spike_in",   FB( list_of(45.f)(25.f) ), list_of("A3")("B3")("C3") ) ;
+        //output->write_outputevents("population-dINs-RHS", 78+i, "spike_out", FB( list_of(200.f)(23.f) ), list_of("A3")("B3")("C3") );
     }
 
 
@@ -40,7 +38,7 @@ void test_neuro_interface()
 
 int main()
 {
-    HDFManager::getInstance().remove_file("myfile.hdf");
+    //HDFManager::getInstance().remove_file("myfile.hdf");
     HDFManager::getInstance().get_file("myfile.hdf");
     HDFManager::getInstance().get_file("myfile.hdf")->get_group("/SimulationResults/P1");
     HDFManager::getInstance().get_file("myfile.hdf")->get_group("/SimulationResults/P1/P2");
@@ -54,7 +52,7 @@ int main()
     ds->append_buffer(data);
     ds->append_buffer(data);
     ds->append_buffer(data);
-    ds->append_buffer(FB(list_of(2.4f)(4.6f)(9.6f)(2.5f).to_adapter() ) );
+    ds->append_buffer(FB(list_of(2.4f)(4.6f)(9.6f)(2.5f) ) );
     ds->append_buffer(FB(list_of(2.4f)(4.6f)(9.6f)(2.5f).to_adapter() ) );
 
 

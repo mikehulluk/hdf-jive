@@ -58,6 +58,7 @@ public:
     // Initialise from pointers:
     DataBuffer1D( const T* data, size_t size) : _data(data, data+size)  {}
     DataBuffer1D( const std::vector<T>& data) : _data(data)  {}
+    //DataBuffer1D( std::vector<T> data) : _data(data)  {}
 
     
     template<int N>
@@ -72,7 +73,7 @@ public:
 typedef DataBuffer1D<float> FloatBuffer1D;
 typedef DataBuffer1D<int> IntBuffer1D;
 
-// Synaptic sugar:
+// Synaptic sugar:2
 typedef FloatBuffer1D FB;
 typedef IntBuffer1D IB;
 
