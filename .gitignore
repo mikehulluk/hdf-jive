@@ -1,3 +1,4 @@
+/python/tagselectorparser_parsetab.py
 /MyResults.hdf
 /python/src/hdfjive.egg-info/PKG-INFO
 /python/src/hdfjive.egg-info/SOURCES.txt
@@ -24,3 +25,7 @@
 *.lai
 *.la
 *.a
+
+*.pyc
+
+*/_output/*
