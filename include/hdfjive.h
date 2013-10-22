@@ -1,4 +1,8 @@
 
+
+#ifndef __HDFJIVE_GUARD_H__
+#define __HDFJIVE_GUARD_H__
+
 #include "hdf5.h"
 #include <hdf5_hl.h>
 
@@ -6,6 +10,7 @@
 #include <boost/weak_ptr.hpp>
 #include <string>
 #include <vector>
+#include <array>
 #include <map>
 #include <boost/enable_shared_from_this.hpp>
 using namespace std;
@@ -20,6 +25,7 @@ herr_t my_hdf5_error_handler (hid_t estack_id, void *unused);
 // Forward declarations:
 class HDF5Group;
 class HDF5File;
+class HDF5DataSet1DStd;
 class HDF5DataSet2DStd;
 
 
@@ -29,12 +35,13 @@ typedef boost::shared_ptr<HDF5Group> HDF5GroupPtr;
 typedef boost::weak_ptr<HDF5Group> HDF5GroupPtrWeak;
 
 typedef boost::shared_ptr<HDF5DataSet2DStd> HDF5DataSet2DStdPtr;
+typedef boost::shared_ptr<HDF5DataSet1DStd> HDF5DataSet1DStdPtr;
 
 
 
 
 
-template< typename T>
+template<typename T>
 class DataBuffer1D
 {
 public:
@@ -50,6 +57,11 @@ public:
 
     // Initialise from pointers:
     DataBuffer1D( const T* data, size_t size) : _data(data, data+size)  {}
+    DataBuffer1D( const std::vector<T>& data) : _data(data)  {}
+
+    
+    template<int N>
+    static DataBuffer1D<T> from_array( std::array<T,N> data){ return DataBuffer1D(&data[0], N); }
 
 
 };
@@ -186,7 +198,6 @@ public:
 
   
     // Single values:
-    
     void append(int value);
     void append(long value);
     void append(float value);
@@ -197,6 +208,12 @@ public:
     void set_data(size_t n, const float* pData);
     void set_data(size_t n, const int* pData);
     void set_data(size_t n, const long* pData);
+
+    template<typename T>
+    void set_data( const DataBuffer1D<T>& buff)
+    {
+        set_data(buff.size(), buff.get_data_pointer() );
+    }
     
     std::string get_fullname() const;
 };
@@ -250,12 +267,27 @@ public:
     HDF5GroupPtr get_subgrouplocal(const string& location);
 
     // Datasets:
+    typedef map<const string, HDF5DataSet1DStdPtr> Dataset1DPtrMap;
     typedef map<const string, HDF5DataSet2DStdPtr> Dataset2DPtrMap;
+    Dataset1DPtrMap datasets_1d;
     Dataset2DPtrMap datasets_2d;
+
+    HDF5DataSet1DStdPtr create_empty_dataset1D(const string& name, const HDF5DataSet1DStdSettings& settings);
     HDF5DataSet2DStdPtr create_empty_dataset2D(const string& name, const HDF5DataSet2DStdSettings& settings);
+
+
+    
+    HDF5DataSet1DStdPtr create_dataset1D(const string& name, const FloatBuffer1D& data);
+    HDF5DataSet1DStdPtr create_dataset1D(const string& name, const IntBuffer1D& data);
+    
+    
+    
+    
+    HDF5DataSet1DStdPtr get_dataset1D(const string& name);
     HDF5DataSet2DStdPtr get_dataset2D(const string& name);
 
     // Links:
+    void create_softlink(const  HDF5DataSet1DStdPtr& target, const std::string& name);
     void create_softlink(const  HDF5DataSet2DStdPtr& target, const std::string& name);
     
     std::string get_fullname() const;
@@ -289,6 +321,7 @@ public:
 
 
     HDF5GroupPtr get_group(const string& location);
+    HDF5DataSet1DStdPtr get_dataset1D(const string& location);
     HDF5DataSet2DStdPtr get_dataset2D(const string& location);
 };
 
@@ -359,8 +392,13 @@ class HDFManager
 
     }
 
-    void remove_file(const string& filename)
-    {
+    //void remove_file(const string& filename)
+    //{
 
-    }
+    //}
 };
+
+
+
+
+#endif

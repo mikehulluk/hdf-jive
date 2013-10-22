@@ -58,12 +58,15 @@ int main()
     ds->append_buffer(FB(list_of(2.4f)(4.6f)(9.6f)(2.5f).to_adapter() ) );
 
 
-    HDFManager::getInstance().get_file("myfile.hdf")->get_dataset2D("/SimulationResults/P1/P2/d1")->append_buffer( FB() | 1.1f | 2.2f | 3.3f | 4.4f );
+    HDFManager::getInstance().get_file("myfile.hdf")->get_dataset2D("/SimulationResults/P1/P2/d1")->append_buffer( FB( list_of(1.1f)(2.2f)(3.3f)(4.4f).to_adapter() ) );
 
     pGroup->create_empty_dataset2D("d2", HDF5DataSet2DStdSettings(1, H5T_NATIVE_INT) );
     pGroup->get_dataset2D("d2")->append_single(30);
     pGroup->get_dataset2D("d2")->append_single(40);
     pGroup->get_dataset2D("d2")->append_single(50);
+
+    pGroup->create_empty_dataset1D("d3", HDF5DataSet1DStdSettings(H5T_NATIVE_INT) );
+    pGroup->get_dataset1D("d3")->append(30);
 
 
     cout << "\n     **** FINISHED OK **** \n";

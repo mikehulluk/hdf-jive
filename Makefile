@@ -17,16 +17,16 @@ $(LIBDIR):
 
 
 lib/libhdfjive.so : include/hdfjive.h src/hdfjive.cpp include/hdfjive-neuro.h src/hdfjive-neuro.cpp
-	g++ -c -g -Wall -Werror -fpic src/hdfjive.cpp   -o lib/hdfjive.o -Iinclude -O3
-	g++ -c -g -Wall -Werror -fpic src/hdfjive-neuro.cpp   -o lib/hdfjive-neuro.o -Iinclude -O3
-	g++ -g -shared -o lib/libhdfjive.so lib/hdfjive.o  lib/hdfjive-neuro.o  -O3
+	g++ -c -g -Wall -Werror -fpic src/hdfjive.cpp   -o lib/hdfjive.o -Iinclude -O3 -std=c++0x
+	g++ -c -g -Wall -Werror -fpic src/hdfjive-neuro.cpp   -o lib/hdfjive-neuro.o -Iinclude -O3 -std=c++0x
+	g++ -g -shared -o lib/libhdfjive.so lib/hdfjive.o  lib/hdfjive-neuro.o  -O3 -std=c++0x
 
 
 
 
 # Test linking:
 test/hdfjive_test1.x : test/hdfjive_test1.cpp lib/libhdfjive.so
-	g++ -L$(LIBDIR) -Iinclude -Wall -o test/hdfjive_test1.x test/hdfjive_test1.cpp -lhdfjive -lhdf5 -lhdf5_hl
+	g++ -L$(LIBDIR) -Iinclude -Wall -o test/hdfjive_test1.x test/hdfjive_test1.cpp -lhdfjive -lhdf5 -lhdf5_hl -std=c++0x
 	
 
 

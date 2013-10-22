@@ -1,14 +1,21 @@
 
+#ifndef __HDFJIVENEURO_GUARD_H__
+#define __HDFJIVENEURO_GUARD_H__
+
+
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 #include <string>
 #include <vector>
 #include <map>
 #include <list>
+#include <set>
 #include <boost/enable_shared_from_this.hpp>
 using namespace std;
 
 
+
+#include "hdfjive.h"
 
 
 
@@ -21,7 +28,8 @@ typedef  boost::shared_ptr<SimulationResults> SimulationResultsPtr;
 typedef  boost::shared_ptr<SimulationResultsFile> SimulationResultsFilePtr;
 typedef  boost::shared_ptr<SharedTimeBuffer>  SharedTimeBufferPtr;
 
-typedef std::list<std::string> TagList;
+typedef std::set<std::string> TagList;
+//typedef std::list<std::string> TagList;
 
 
 
@@ -49,9 +57,10 @@ public:
     SimulationResults(HDF5FilePtr , const std::string& simulationname);
 
     SharedTimeBufferPtr write_shared_time_buffer(const FloatBuffer1D& b);
-    void write_trace( const std::string populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, const FloatBuffer1D& data, const TagList& tags );
-    void write_outputevents( const std::string populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags );
-    void write_inputevents( const std::string populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags );
+    SharedTimeBufferPtr write_shared_time_buffer(size_t length, double dt);
+    void write_trace( const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, const FloatBuffer1D& data, const TagList& tags );
+    void write_outputevents( const std::string& populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags );
+    void write_inputevents( const std::string& populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags );
 
 };
 
@@ -68,4 +77,6 @@ public:
 
 
 
+
+#endif
 

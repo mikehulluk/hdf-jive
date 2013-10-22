@@ -20,8 +20,21 @@ SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(const FloatBuffe
     return SharedTimeBufferPtr(new SharedTimeBuffer(pDataSet) );
 }
 
-void SimulationResults::write_trace( const std::string populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, const FloatBuffer1D& data, const TagList& tags )
+
+SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(size_t length, double dt)
 {
+    vector<float> data(length);
+    for(size_t i=0;i<length;i++)
+        data[i] = i*dt;
+
+    return this->write_shared_time_buffer( FloatBuffer1D( data ) );
+
+}
+
+
+void SimulationResults::write_trace( const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, const FloatBuffer1D& data, const TagList& tags_in )
+{
+
     HDF5GroupPtr pNodeGroup = pSimulationGroup
         ->get_group(populationname)
         ->get_group((boost::format("%04d")%index).str() )
@@ -32,9 +45,16 @@ void SimulationResults::write_trace( const std::string populationname, int index
         ->get_group("raw");
 
 
+    // Create a list of tags, including those specified:
+    TagList tags(tags_in);
+    tags.insert(record_name);
+    tags.insert((boost::format("POPINDEX:%04d")%index).str() );
+    tags.insert((boost::format("POPNAME:%s")%populationname).str() );
+
+    
     // Add the tags to the node-group:
     pNodeGroup->add_attribute("hdf-jive", "trace");
-    pNodeGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
+    if(tags.size() != 0) pNodeGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
     
     // Soft-link the time:
     pDataGroup->create_softlink(times->pArray, "time");
@@ -49,7 +69,7 @@ void SimulationResults::write_trace( const std::string populationname, int index
 
                 
 
-void SimulationResults::write_outputevents( const std::string populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags )
+void SimulationResults::write_outputevents( const std::string& populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags )
 {
     HDF5GroupPtr pGroup = pSimulationGroup
         ->get_group(populationname)
@@ -67,7 +87,7 @@ void SimulationResults::write_outputevents( const std::string populationname, in
 }
 
 
-void SimulationResults::write_inputevents( const std::string populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags )
+void SimulationResults::write_inputevents( const std::string& populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags )
 {
     HDF5GroupPtr pGroup = pSimulationGroup
         ->get_group(populationname)
