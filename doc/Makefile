@@ -1,6 +1,11 @@
 # Makefile for Sphinx documentation
 #
 
+# Build the html by default:
+default: html
+
+
+
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
