@@ -58,6 +58,7 @@ public:
     SimulationResults(HDF5FilePtr , const std::string& simulationname);
 
 
+
     /**
      * Define the time buffer based on a fixed-size.
      */ 
@@ -70,15 +71,25 @@ public:
     template<typename TIMEDATATYPE>
     SharedTimeBufferPtr write_shared_time_buffer(size_t length, TIMEDATATYPE* pData);
 
+    /**
+     * Define the time buffer using an STL container
+     */ 
+    template<typename FwdIt>
+    SharedTimeBufferPtr write_shared_time_buffer(FwdIt it, FwdIt end);
 
 
     /**
-     * Define the time buffer using an array of time-points.
+     * Record a trace to the hdfjive file, using a pointer to the raw data. The length of the array should be the same as the time-buffer.
      */ 
-    //void write_trace( const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, const FloatBuffer1D& data, const TagList& tags );
-
     template<typename TIMEDATATYPE>
-    void write_trace( const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, TIMEDATATYPE* pData, const TagList& tags=TagList() );
+    void write_trace(const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, TIMEDATATYPE* pData, const TagList& tags=TagList());
+
+    /**
+     * Record a trace to the hdfjive file from an STL container. The length of the container should be the same as the time-buffer.
+     */ 
+    template<typename FwdIt>
+    void write_trace(const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, FwdIt it, FwdIt end, const TagList& tags=TagList());
+
 
     
     void write_outputevents( const std::string& populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags );

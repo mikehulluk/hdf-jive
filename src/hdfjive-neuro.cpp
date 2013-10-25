@@ -15,16 +15,8 @@ SimulationResults::SimulationResults(HDF5FilePtr file, const std::string& simula
 
 
 
-/*
-SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(const FloatBuffer1D& b)
-{
-    const std::string& array_name = (boost::format("time_array%01d")%n_shared_time_buffers++).str();
-    HDF5DataSet2DStdPtr pDataSet = pSimulationGroup->get_group("shared_time_arrays")->create_empty_dataset2D(array_name, HDF5DataSet2DStdSettings(1, H5T_NATIVE_FLOAT) );
-    pDataSet->set_data( b.size(), 1, b.get_data_pointer());
 
-    return SharedTimeBufferPtr(new SharedTimeBuffer(pDataSet) );
-}
-* */
+
 
 
 
@@ -32,7 +24,7 @@ template<typename TIMEDATATYPE>
 SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(size_t length, TIMEDATATYPE* pData)
 {
     const std::string& array_name = (boost::format("time_array%01d")%n_shared_time_buffers++).str();
-    HDF5DataSet2DStdPtr pDataSet = pSimulationGroup->get_group("shared_time_arrays")->create_empty_dataset2D(array_name, HDF5DataSet2DStdSettings(1, H5T_NATIVE_FLOAT) );
+    HDF5DataSet2DStdPtr pDataSet = pSimulationGroup->get_group("shared_time_arrays")->create_empty_dataset2D(array_name, HDF5DataSet2DStdSettings(1, CPPTypeToHDFType<TIMEDATATYPE>::get_hdf_type() ) );
     pDataSet->set_data( length, 1, pData);
 
     return SharedTimeBufferPtr(new SharedTimeBuffer(pDataSet) );
@@ -46,7 +38,7 @@ SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(size_t length, T
     for(size_t i=0;i<length;i++)
         data[i] = i*dt;
 
-    return this->write_shared_time_buffer( &data );
+    return this->write_shared_time_buffer(length, &(data[0]));
 }
 
 
@@ -57,12 +49,9 @@ SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(size_t length, T
 
 
 
-//void write_trace( const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, TIMEDATATYPE* pData, const TagList& tags=TagList() );
-
 template<typename TIMEDATATYPE>
 void SimulationResults::write_trace( const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times,  TIMEDATATYPE* pData, const TagList& tags_in )
 {
-
     HDF5GroupPtr pNodeGroup = pSimulationGroup
         ->get_group(populationname)
         ->get_group((boost::format("%04d")%index).str() )
@@ -72,14 +61,12 @@ void SimulationResults::write_trace( const std::string& populationname, int inde
     HDF5GroupPtr pDataGroup = pNodeGroup
         ->get_group("raw");
 
-
     // Create a list of tags, including those specified:
     TagList tags(tags_in);
     tags.insert(record_name);
     tags.insert((boost::format("POPINDEX:%04d")%index).str() );
     tags.insert((boost::format("POPNAME:%s")%populationname).str() );
 
-    
     // Add the tags to the node-group:
     pNodeGroup->add_attribute("hdf-jive", "trace");
     if(tags.size() != 0) pNodeGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ","));
@@ -88,18 +75,35 @@ void SimulationResults::write_trace( const std::string& populationname, int inde
     pDataGroup->create_softlink(times->get_dataset(), "time");
 
     // Create the data:
-    HDF5DataSet2DStdPtr pDataSet = pDataGroup->create_empty_dataset2D("data", HDF5DataSet2DStdSettings(1, H5T_NATIVE_FLOAT) );
-    
-
-
+    HDF5DataSet2DStdPtr pDataSet = pDataGroup->create_empty_dataset2D("data", HDF5DataSet2DStdSettings(1, CPPTypeToHDFType<TIMEDATATYPE>::get_hdf_type()) );
     pDataSet->set_data( times->get_size(), 1, pData);
-
-
-
 }
 
-                
 
+template<typename FwdIt>
+void SimulationResults::write_trace( const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, FwdIt it, FwdIt end, const TagList& tags)
+{
+    typedef typename std::iterator_traits<FwdIt>::value_type T;
+
+    // Copy the data into a vector, so that its contiguous:
+    vector<T> data(it, end);
+    assert(data.size() == times->get_size());
+    
+    write_trace<T>(populationname, index, record_name, times,  &data[0], tags);
+}
+
+
+                
+template<typename FwdIt>
+SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(FwdIt it, FwdIt end)
+{
+    typedef typename std::iterator_traits<FwdIt>::value_type T;
+
+    // Copy the data into a vector, so that its contiguous:
+    vector<T> data(it, end);
+    
+    return write_shared_time_buffer<T>(data.size(), &(data[0]));
+}
 
 
 
@@ -157,3 +161,5 @@ SimulationResultsPtr SimulationResultsFile::Simulation(const std::string& simula
     return SimulationResultsPtr( new SimulationResults(this->file, simulationname) );
 }
 
+
+#include "hdfjive-neuro_tmpl-inst.cpp"

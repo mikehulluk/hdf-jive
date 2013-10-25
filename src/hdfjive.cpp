@@ -230,6 +230,10 @@ void HDF5DataSet2DStd::set_data(size_t m, size_t n, const long* pData)
     length = _write_to_array_2D<long>(H5T_NATIVE_LONG, pData, m, n, dataset_id);
 }
 
+size_t HDF5DataSet2DStd::get_length() const
+{
+    return length;
+}
 
 
 
@@ -255,6 +259,10 @@ void HDF5DataSet2DStd::set_data(size_t m, size_t n, const long* pData)
 
 
 
+size_t HDF5DataSet1DStd::get_length() const
+{
+    return length;
+}
 
 HDF5DataSet1DStd::HDF5DataSet1DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet1DStdSettings& settings)
     : length(0), name(name), pParent(pParent), settings(settings)
