@@ -1,3 +1,6 @@
+/.sconsign.dblite
+/src/hdfjive-neuro.os
+/src/hdfjive.os
 /python/tagselectorparser_parsetab.py
 /MyResults.hdf
 /python/src/hdfjive.egg-info/PKG-INFO

@@ -74,10 +74,10 @@ The following code blocks creates a new HDF file and writes data into it (which 
 
 
 
+.. toctree::
 
-.. doxygenclass:: HDF5DataSet1DStd
-   :project: hdfjive
-   :members:
+    srcs/cpp
+
 
 
 

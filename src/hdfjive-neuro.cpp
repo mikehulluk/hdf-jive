@@ -11,6 +11,11 @@ SimulationResults::SimulationResults(HDF5FilePtr file, const std::string& simula
 {
 }
 
+
+
+
+
+/*
 SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(const FloatBuffer1D& b)
 {
     const std::string& array_name = (boost::format("time_array%01d")%n_shared_time_buffers++).str();
@@ -19,20 +24,43 @@ SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(const FloatBuffe
 
     return SharedTimeBufferPtr(new SharedTimeBuffer(pDataSet) );
 }
+* */
 
 
-SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(size_t length, double dt)
+
+template<typename TIMEDATATYPE>
+SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(size_t length, TIMEDATATYPE* pData)
 {
-    vector<float> data(length);
-    for(size_t i=0;i<length;i++)
-        data[i] = i*dt;
+    const std::string& array_name = (boost::format("time_array%01d")%n_shared_time_buffers++).str();
+    HDF5DataSet2DStdPtr pDataSet = pSimulationGroup->get_group("shared_time_arrays")->create_empty_dataset2D(array_name, HDF5DataSet2DStdSettings(1, H5T_NATIVE_FLOAT) );
+    pDataSet->set_data( length, 1, pData);
 
-    return this->write_shared_time_buffer( FloatBuffer1D( data ) );
-
+    return SharedTimeBufferPtr(new SharedTimeBuffer(pDataSet) );
 }
 
 
-void SimulationResults::write_trace( const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, const FloatBuffer1D& data, const TagList& tags_in )
+template<typename TIMEDATATYPE>
+SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(size_t length, TIMEDATATYPE dt)
+{
+    vector<TIMEDATATYPE> data(length);
+    for(size_t i=0;i<length;i++)
+        data[i] = i*dt;
+
+    return this->write_shared_time_buffer( &data );
+}
+
+
+
+
+
+
+
+
+
+//void write_trace( const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, TIMEDATATYPE* pData, const TagList& tags=TagList() );
+
+template<typename TIMEDATATYPE>
+void SimulationResults::write_trace( const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times,  TIMEDATATYPE* pData, const TagList& tags_in )
 {
 
     HDF5GroupPtr pNodeGroup = pSimulationGroup
@@ -57,17 +85,29 @@ void SimulationResults::write_trace( const std::string& populationname, int inde
     if(tags.size() != 0) pNodeGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ","));
     
     // Soft-link the time:
-    pDataGroup->create_softlink(times->pArray, "time");
+    pDataGroup->create_softlink(times->get_dataset(), "time");
 
     // Create the data:
     HDF5DataSet2DStdPtr pDataSet = pDataGroup->create_empty_dataset2D("data", HDF5DataSet2DStdSettings(1, H5T_NATIVE_FLOAT) );
-    pDataSet->set_data( data.size(), 1, data.get_data_pointer());
+    
+
+
+    pDataSet->set_data( times->get_size(), 1, pData);
 
 
 
 }
 
                 
+
+
+
+
+
+
+
+
+
 
 void SimulationResults::write_outputevents( const std::string& populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags )
 {

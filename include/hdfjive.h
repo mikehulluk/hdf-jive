@@ -18,8 +18,14 @@ using namespace std;
 
 
 // Signal Errors:
-//herr_t my_hdf5_error_handler (void *unused);
 herr_t my_hdf5_error_handler (hid_t estack_id, void *unused);
+
+
+
+
+
+#include "hdfjive-buffers.h"
+
 
 
 // Forward declarations:
@@ -41,44 +47,6 @@ typedef boost::shared_ptr<HDF5DataSet1DStd> HDF5DataSet1DStdPtr;
 
 
 
-template<typename T>
-class DataBuffer1D
-{
-public:
-    vector<T> _data;
-
-    inline T* get_data_pointer() {  return &(this->_data[0]); }
-    inline const T* get_data_pointer() const {  return &(this->_data[0]); }
-    inline size_t size() const { return this->_data.size(); }
-
-    inline void push(const T& o){ _data.push_back(o); }
-
-    DataBuffer1D( ) {}
-
-    // Initialise from pointers:
-    DataBuffer1D( const T* data, size_t size) : _data(data, data+size)  {}
-    DataBuffer1D( const std::vector<T>& data) : _data(data)  {}
-    //DataBuffer1D( std::vector<T> data) : _data(data)  {}
-
-    
-    template<int N>
-    static DataBuffer1D<T> from_array( std::array<T,N> data){ return DataBuffer1D(&data[0], N); }
-
-
-};
-
-
-
-// Types of buffers:
-typedef DataBuffer1D<float> FloatBuffer1D;
-typedef DataBuffer1D<int> IntBuffer1D;
-
-// Synaptic sugar:2
-typedef FloatBuffer1D FB;
-typedef IntBuffer1D IB;
-
-
-
 
 
 
@@ -96,15 +64,12 @@ public:
 };
 
 
-
-
-
-
-
 class HDF5DataSet2DStd : public  boost::enable_shared_from_this<HDF5DataSet2DStd>
 {
     hid_t dataset_id;
     hid_t dataspace_id;
+
+    size_t length;
 
 public:
     const string name;
@@ -145,6 +110,8 @@ public:
     
 
     std::string get_fullname() const;
+
+    size_t get_length() const;
 };
 
 
@@ -179,15 +146,12 @@ public:
 };
 
 
-
-
-
-
-
 class HDF5DataSet1DStd : public  boost::enable_shared_from_this<HDF5DataSet1DStd>
 {
     hid_t dataset_id;
     hid_t dataspace_id;
+
+    size_t length;
 
 public:
     const string name;
@@ -217,25 +181,8 @@ public:
     }
     
     std::string get_fullname() const;
+    size_t get_length() const;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -293,15 +240,10 @@ public:
     
     std::string get_fullname() const;
     void add_attribute(const string& name, const string& value);
+
+
+    size_t get_length() const;
 };
-
-
-
-
-
-
-
-
 
 
 
@@ -325,22 +267,6 @@ public:
     HDF5DataSet1DStdPtr get_dataset1D(const string& location);
     HDF5DataSet2DStdPtr get_dataset2D(const string& location);
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -387,16 +313,9 @@ class HDFManager
             // Create the new file object:
             files[filename] = HDF5FilePtr( new HDF5File(filename) );
         }
-
         return files[filename];
-
-
     }
 
-    //void remove_file(const string& filename)
-    //{
-
-    //}
 };
 
 
