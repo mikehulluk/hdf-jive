@@ -162,4 +162,48 @@ SimulationResultsPtr SimulationResultsFile::Simulation(const std::string& simula
 }
 
 
+
+
+
+
+
+
+
+
+ // Simple, a pointer to an array of spike-times:
+template<typename TIMEDATATYPE>
+void SimulationResults::write_outputeventsNEW( const std::string& populationname, int index, const std::string& record_name, size_t n_events, TIMEDATATYPE*, const TagList& tags)
+{
+    assert(0);
+
+}
+
+
+// STL container of Event-objects
+template<typename FwdIt>
+void SimulationResults::write_outputeventsNEW( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags)
+{
+    assert(0);
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #include "hdfjive-neuro_tmpl-inst.cpp"

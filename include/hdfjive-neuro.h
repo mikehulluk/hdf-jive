@@ -16,6 +16,8 @@ using namespace std;
 
 
 #include "hdfjive.h"
+#include "hdfjive-events.h"
+
 
 
 
@@ -29,6 +31,12 @@ typedef  boost::shared_ptr<SimulationResultsFile> SimulationResultsFilePtr;
 typedef  boost::shared_ptr<SharedTimeBuffer>  SharedTimeBufferPtr;
 
 typedef std::set<std::string> TagList;
+
+
+
+
+
+
 
 
 
@@ -91,10 +99,33 @@ public:
     void write_trace(const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, FwdIt it, FwdIt end, const TagList& tags=TagList());
 
 
+
+    /** 
+     *  Saving events
+     */
+
+     // Simple, a pointer to an array of spike-times:
+    template<typename TIMEDATATYPE>
+    void write_outputeventsNEW( const std::string& populationname, int index, const std::string& record_name, size_t n_events, TIMEDATATYPE*, const TagList& tags=TagList() );
+
+    // STL container of Event-objects
+    template<typename FwdIt>
+    void write_outputeventsNEW( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() );
+
+
+
+
+
     
     void write_outputevents( const std::string& populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags );
     void write_inputevents( const std::string& populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags );
 
+
+
+    
+
+    
+    
 };
 
 

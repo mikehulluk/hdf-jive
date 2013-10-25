@@ -8,6 +8,6 @@ env = Environment(
 env.Append(CPPPATH = ['include/'])
 
 
-hdflib = env.SharedLibrary('lib/libhdfjive.so', ['src/hdfjive.cpp', 'src/hdfjive-neuro.cpp'] )
+hdflib = env.SharedLibrary('lib/libhdfjive.so', ['src/hdfjive.cpp', 'src/hdfjive-neuro.cpp', 'src/hdfjive-events.cpp'] )
 
 env.Program('test/test_hdfjive-neuro.x', ['test/test_hdfjive-neuro.cpp', hdflib])
