@@ -43,10 +43,20 @@ help:
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 
-clean:
+
+
+HEADERS = ../include/hdfjive-neuro.h ../include/hdfjive.h
+SRCS = ../src/hdfjive-neuro.cpp ../src/hdfjive.cpp
+doxygen-sphinx: $(HEADERS) $(SRCS) Doxyfile
+	rm -rf _build/doxygen/
+	doxygen
+
+
+
+clean: 
 	-rm -rf $(BUILDDIR)/*
 
-html:
+html: doxygen-sphinx
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."

@@ -55,10 +55,10 @@ The following code blocks creates a new HDF file and writes data into it (which 
     {
         float time_data[] = {-1,-2,-3,-4} ;
         FloatBuffer1D time_buff(time_data, 4);
-        
+
         float v0_data[] = {2.4, .3,4, 4.6, 9.6} ;
         FloatBuffer1D v0_buff(v0_data, 4);
-       
+
         SimulationResultsPtr output = SimulationResultsFile("MyResults.hdf").Simulation("Sim1");
         SharedTimeBufferPtr times = output->write_shared_time_buffer(time_buff);
 
@@ -72,7 +72,14 @@ The following code blocks creates a new HDF file and writes data into it (which 
     }
 
 
-    
+
+
+
+.. doxygenclass:: HDF5DataSet1DStd
+   :project: hdfjive
+   :members:
+
+
 
 
 
@@ -105,7 +112,7 @@ Using Python
 
 
 
-Using the command-line 
+Using the command-line
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Once the hdf5 file has been generate, it can be viewed from the commandline using:
@@ -114,7 +121,7 @@ Once the hdf5 file has been generate, it can be viewed from the commandline usin
 
     # Using paths:
     $ hdfjive plot "PATH: Sim1/population-dINs-RHS/0000/soma/VARIABLES/Voltage"
-    
+
     # Using 'tags':
     $ hdfjive plot "TAGS: ALL{POPINDEX:0000,Voltage}"
 
