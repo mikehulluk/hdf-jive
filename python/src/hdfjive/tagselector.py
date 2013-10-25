@@ -100,22 +100,3 @@ class TagSelect(TagSelectorAll):
 
 
 
-
-
-
-#class PredAnd(object):
-#    pass
-#
-#
-#class PredOr(object):
-#    pass
-#
-#class PredNot(object):
-#    pass
-#
-#class PredAll(object):
-#    pass
-#
-#class PredAny(object):
-#    pass
-

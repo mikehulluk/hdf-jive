@@ -9,20 +9,14 @@ import cmdline_plot
 
 def build_argparser():
 
-    parser = argparse.ArgumentParser(description='??')
-
+    parser = argparse.ArgumentParser(description='HDF-jive command-line tools')
     subparsers = parser.add_subparsers(help='sub-command help')
-    
     cmdline_plot.build_subparser(subparsers)
-    
     return parser
 
 
 def main():
-    print 'hdfjive commandline interface'
-
     parser = build_argparser()
-    
     args = parser.parse_args()
 
     # Run the subcommand:

@@ -35,8 +35,8 @@ Quickstart
 Some examples of how to create hdf-jive files are given below.
 
 
-C++ API
-~~~~~~~~
+Using C++
+~~~~~~~~~
 
 The following code blocks creates a new HDF file and writes data into it (which would typically come from a simulation).
 
@@ -76,7 +76,16 @@ The following code blocks creates a new HDF file and writes data into it (which 
 
 
 
-Python API
+Using Python
+~~~~~~~~~~~~
+
+.. todo::
+
+    Make it correct!
+
+
+
+Using Java
 ~~~~~~~~~~
 
 .. todo::
@@ -85,8 +94,9 @@ Python API
 
 
 
-Java API
-~~~~~~~~
+
+Using Python
+~~~~~~~~~~~~~
 
 .. todo::
 
@@ -95,18 +105,8 @@ Java API
 
 
 
-Python API
-~~~~~~~~~~~
-
-.. todo::
-
-    Make it correct!
-
-
-
-
-Commandline API
-~~~~~~~~~~~~~~~
+Using the command-line 
+~~~~~~~~~~~~~~~~~~~~~~
 
 Once the hdf5 file has been generate, it can be viewed from the commandline using:
 
