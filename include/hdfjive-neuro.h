@@ -42,7 +42,6 @@ typedef std::set<std::string> TagList;
 
 
 
-
 class SharedTimeBuffer
 {
     HDF5DataSet2DStdPtr pArray;
@@ -60,6 +59,11 @@ class SimulationResults
 
     int n_shared_time_buffers;
     HDF5GroupPtr pSimulationGroup;
+
+    
+    std::map<string, size_t> population_indices;
+    
+
 
 public:
     //! Nutshell constructor
@@ -101,18 +105,58 @@ public:
 
 
     /** 
-     *  Saving events
+     *  Saving 'output' events. We do not store a reference for these events
      */
 
-     // Simple, a pointer to an array of spike-times:
-    template<typename TIMEDATATYPE>
-    void write_outputeventsNEW( const std::string& populationname, int index, const std::string& record_name, size_t n_events, TIMEDATATYPE*, const TagList& tags=TagList() );
-
-    // STL container of Event-objects
+     // A. With no parameters:
+     // i. Simple, a pointer to an array of spike-times:
+    template<typename DATATYPE> void write_outputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, size_t n_events, DATATYPE*, const TagList& tags=TagList() );
+    // ii. STL container of times
     template<typename FwdIt>
-    void write_outputeventsNEW( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() );
+    void write_outputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() );
+
+    // B. With parameters, storing events as objects:
+    template<typename FwdIt>
+    void write_outputevents_byobjects(const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() );
+
+    // C. With parameters, storing events parameters in arrays:
+    /*
+    template<typename DATATYPE>void write_outputeventsNEW2(const std::string& populationname, int nrn_index, const std::string& record_name, size_t, DATATYPE* pTimes, const TagList& tags=TagList() );
+    template<typename DATATYPE>void write_outputeventsNEW2(const std::string& populationname, int nrn_index, const std::string& record_name, size_t, DATATYPE* pTimes, DATATYPE* p0, const TagList& tags=TagList() );
+    template<typename DATATYPE>void write_outputeventsNEW2(const std::string& populationname, int nrn_index, const std::string& record_name, size_t, DATATYPE* pTimes, DATATYPE* p0, DATATYPE* p1, const TagList& tags=TagList() );
+    template<typename DATATYPE>void write_outputeventsNEW2(const std::string& populationname, int nrn_index, const std::string& record_name, size_t, DATATYPE* pTimes, DATATYPE* p0, DATATYPE* p1, DATATYPE* p2, const TagList& tags=TagList() );
+    template<typename DATATYPE>void write_outputeventsNEW2(const std::string& populationname, int nrn_index, const std::string& record_name, size_t, DATATYPE* pTimes, DATATYPE* p0, DATATYPE* p1, DATATYPE* p2, DATATYPE* p3, const TagList& tags=TagList() );
+    template<typename DATATYPE>void write_outputeventsNEW2(const std::string& populationname, int nrn_index, const std::string& record_name, size_t, DATATYPE* pTimes, DATATYPE* p0, DATATYPE* p1, DATATYPE* p2, DATATYPE* p3, DATATYPE* p4, const TagList& tags=TagList() );
+    */
+
+    
 
 
+    /** 
+     *  Saving 'input' events. These are in general similar to the 'output' event, but they can also contain a reference to the 'output' event that caused it:
+     */
+
+     // A. With no parameters (no reference to input events):
+     // i. Simple, a pointer to an array of spike-times:
+    template<typename DATATYPE> void write_inputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, size_t n_events, DATATYPE*, const TagList& tags=TagList() );
+    // ii. STL container of times
+    template<typename FwdIt> void write_inputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() );
+
+    // B. With parameters, storing events as objects:
+    template<typename FwdIt> void write_inputevents_byobjects(const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() );
+
+    // C. With parameters, storing events parameters in arrays:
+    /*
+    template<typename DATATYPE>void write_inputeventsNEW2(const std::string& populationname, int nrn_index, const std::string& record_name,   size_t, SrcEventReference* pSrcs, DATATYPE* pTimes, const TagList& tags=TagList() );
+    template<typename DATATYPE>void write_inputeventsNEW2(const std::string& populationname, int nrn_index, const std::string& record_name,   size_t, SrcEventReference* pSrcs, DATATYPE* pTimes, DATATYPE* p0, const TagList& tags=TagList() );
+    template<typename DATATYPE>void write_inputeventsNEW2(const std::string& populationname, int nrn_index, const std::string& record_name,   size_t, SrcEventReference* pSrcs, DATATYPE* pTimes, DATATYPE* p0, DATATYPE* p1, const TagList& tags=TagList() );
+    template<typename DATATYPE>void write_inputeventsNEW2(const std::string& populationname, int nrn_index, const std::string& record_name,   size_t, SrcEventReference* pSrcs, DATATYPE* pTimes, DATATYPE* p0, DATATYPE* p1, DATATYPE* p2, const TagList& tags=TagList() );
+    template<typename DATATYPE>void write_inputeventsNEW2(const std::string& populationname, int nrn_index, const std::string& record_name,   size_t, SrcEventReference* pSrcs, DATATYPE* pTimes, DATATYPE* p0, DATATYPE* p1, DATATYPE* p2, DATATYPE* p3, const TagList& tags=TagList() );
+    template<typename DATATYPE>void write_outputeventsNEW2(const std::string& populationname, int nrn_index, const std::string& record_name,  size_t, SrcEventReference* pSrcs, DATATYPE* pTimes, DATATYPE* p0, DATATYPE* p1, DATATYPE* p2, DATATYPE* p3, DATATYPE* p4, const TagList& tags=TagList() );
+    */
+
+
+    
 
 
 

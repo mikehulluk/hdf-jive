@@ -34,4 +34,36 @@ public:
 
 
 
+
+struct SrcEventReference
+{
+    size_t src_population_index;
+    size_t src_neuron_index;
+    size_t src_event_index;
+
+public:
+
+    SrcEventReference(size_t src_population_index, size_t src_neuron_index, size_t src_event_index);
+};
+
+
+
+
+
+template<typename EVENTTYPE_>
+class InputEventType
+{
+    typedef EVENTTYPE_ EVENTTYPE;
+    SrcEventReference evt_src;
+    EVENTTYPE evt_details;
+
+public:
+    InputEventType(const SrcEventReference& src, const EVENTTYPE& evt_details);
+
+
+};
+
+
+
+
 #endif

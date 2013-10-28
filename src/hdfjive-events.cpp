@@ -4,26 +4,6 @@
 #include <assert.h>
 
 
-/*
-template<typename DATATYPE, int NPARAMS>
-class EventType
-{
-    size_t event_index;
-    DATATYPE time;
-    std::array<DATATYPE, NPARAMS> parameters;
-
-public:
-
-    // Constructor
-    EventType(size_t event_index, DATATYPE time);
-    EventType(size_t event_index, DATATYPE time, DATATYPE* pParams);
-    EventType(size_t event_index, DATATYPE time, DATATYPE p0);
-    EventType(size_t event_index, DATATYPE time, DATATYPE p0, DATATYPE p1);
-    EventType(size_t event_index, DATATYPE time, DATATYPE p0, DATATYPE p1, DATATYPE p2);
-    EventType(size_t event_index, DATATYPE time, DATATYPE p0, DATATYPE p1, DATATYPE p2, DATATYPE p3);
-};
-*/
-
 template<typename DATATYPE, int NPARAMS>
 EventType<DATATYPE,NPARAMS>::EventType(size_t event_index, DATATYPE time)
     : event_index(event_index), time(time)
@@ -66,23 +46,21 @@ EventType<DATATYPE,NPARAMS>::EventType(size_t event_index, DATATYPE time, DATATY
 
 
 
+SrcEventReference::SrcEventReference(size_t src_population_index, size_t src_neuron_index, size_t src_event_index)
+: src_population_index(src_population_index), src_neuron_index(src_neuron_index), src_event_index(src_event_index)
+{
+
+}
 
 
 
+template<typename EVENTTYPE_>
+InputEventType<EVENTTYPE_>::InputEventType(const SrcEventReference& src, const EVENTTYPE& evt_details)
+    : evt_src(evt_src), evt_details(evt_details)
+{
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 
@@ -113,4 +91,30 @@ template EventType<double,1>::EventType(size_t, double, double);
 template EventType<double,2>::EventType(size_t, double, double, double);
 template EventType<double,3>::EventType(size_t, double, double, double, double);
 template EventType<double,4>::EventType(size_t, double, double, double, double, double);
+
+
+template InputEventType< EventType<int,0> >::InputEventType(const SrcEventReference&, const EventType<int,0>& );
+template InputEventType< EventType<int,1> >::InputEventType(const SrcEventReference&, const EventType<int,1>& );
+template InputEventType< EventType<int,2> >::InputEventType(const SrcEventReference&, const EventType<int,2>& );
+template InputEventType< EventType<int,3> >::InputEventType(const SrcEventReference&, const EventType<int,3>& );
+template InputEventType< EventType<int,4> >::InputEventType(const SrcEventReference&, const EventType<int,4>& );
+
+template InputEventType< EventType<long,0> >::InputEventType(const SrcEventReference&, const EventType<long,0>& );
+template InputEventType< EventType<long,1> >::InputEventType(const SrcEventReference&, const EventType<long,1>& );
+template InputEventType< EventType<long,2> >::InputEventType(const SrcEventReference&, const EventType<long,2>& );
+template InputEventType< EventType<long,3> >::InputEventType(const SrcEventReference&, const EventType<long,3>& );
+template InputEventType< EventType<long,4> >::InputEventType(const SrcEventReference&, const EventType<long,4>& );
+
+template InputEventType< EventType<float,0> >::InputEventType(const SrcEventReference&, const EventType<float,0>& );
+template InputEventType< EventType<float,1> >::InputEventType(const SrcEventReference&, const EventType<float,1>& );
+template InputEventType< EventType<float,2> >::InputEventType(const SrcEventReference&, const EventType<float,2>& );
+template InputEventType< EventType<float,3> >::InputEventType(const SrcEventReference&, const EventType<float,3>& );
+template InputEventType< EventType<float,4> >::InputEventType(const SrcEventReference&, const EventType<float,4>& );
+
+template InputEventType< EventType<double,0> >::InputEventType(const SrcEventReference&, const EventType<double,0>& );
+template InputEventType< EventType<double,1> >::InputEventType(const SrcEventReference&, const EventType<double,1>& );
+template InputEventType< EventType<double,2> >::InputEventType(const SrcEventReference&, const EventType<double,2>& );
+template InputEventType< EventType<double,3> >::InputEventType(const SrcEventReference&, const EventType<double,3>& );
+template InputEventType< EventType<double,4> >::InputEventType(const SrcEventReference&, const EventType<double,4>& );
+
 

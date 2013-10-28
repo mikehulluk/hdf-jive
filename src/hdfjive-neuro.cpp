@@ -170,23 +170,90 @@ SimulationResultsPtr SimulationResultsFile::Simulation(const std::string& simula
 
 
 
+
+
+
+
+
+
+
  // Simple, a pointer to an array of spike-times:
 template<typename TIMEDATATYPE>
-void SimulationResults::write_outputeventsNEW( const std::string& populationname, int index, const std::string& record_name, size_t n_events, TIMEDATATYPE*, const TagList& tags)
+void SimulationResults::write_outputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, size_t n_events, TIMEDATATYPE*, const TagList& tags)
 {
-    assert(0);
-
+    //assert(0);
+    cout << "Not saving!!";
 }
+
 
 
 // STL container of Event-objects
 template<typename FwdIt>
-void SimulationResults::write_outputeventsNEW( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags)
+void SimulationResults::write_outputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags)
 {
-    assert(0);
-
-
+    typedef typename std::iterator_traits<FwdIt>::value_type T;
+    vector<T> data( it, end);
+    write_outputevents_onlytimes( populationname, index, record_name, data.size(), &data[0], tags);
 }
+
+
+
+
+
+
+
+
+// B. With parameters, storing events as objects:
+template<typename FwdIt>
+void SimulationResults::write_outputevents_byobjects(const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags )
+{
+assert(0);
+}
+
+
+
+/** 
+ *  Saving 'input' events. These are in general similar to the 'output' event, but they can also contain a reference to the 'output' event that caused it:
+ */
+
+ // A. With no parameters (no reference to input events):
+ // i. Simple, a pointer to an array of spike-times:
+template<typename DATATYPE> void SimulationResults::write_inputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, size_t n_events, DATATYPE*, const TagList& tags )
+{
+assert(0);
+}
+
+
+// ii. STL container of times
+template<typename FwdIt> void SimulationResults::write_inputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags)
+{
+assert(0);
+}
+
+
+// B. With parameters, storing events as objects:
+template<typename FwdIt> void SimulationResults::write_inputevents_byobjects(const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags )
+{
+assert(0);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
