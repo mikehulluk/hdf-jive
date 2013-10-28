@@ -220,21 +220,21 @@ assert(0);
  // i. Simple, a pointer to an array of spike-times:
 template<typename DATATYPE> void SimulationResults::write_inputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, size_t n_events, DATATYPE*, const TagList& tags )
 {
-assert(0);
+    assert(0);
 }
 
 
 // ii. STL container of times
 template<typename FwdIt> void SimulationResults::write_inputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags)
 {
-assert(0);
+    assert(0);
 }
 
 
 // B. With parameters, storing events as objects:
 template<typename FwdIt> void SimulationResults::write_inputevents_byobjects(const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags )
 {
-assert(0);
+    assert(0);
 }
 
 

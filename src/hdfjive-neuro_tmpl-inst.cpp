@@ -148,6 +148,22 @@ template void SimulationResults::write_outputevents_onlytimes<ListFloat::iterato
 template void SimulationResults::write_outputevents_onlytimes<ListDouble::iterator>( const std::string& populationname, int index, const std::string& record_name, ListDouble::iterator it, ListDouble::iterator end, const TagList& );
 
 
+template void SimulationResults::write_inputevents_onlytimes<int>( const std::string& populationname, int index, const std::string& record_name,    size_t, int*, const TagList& );
+template void SimulationResults::write_inputevents_onlytimes<long>( const std::string& populationname, int index, const std::string& record_name,    size_t, long*, const TagList& );
+template void SimulationResults::write_inputevents_onlytimes<float>( const std::string& populationname, int index, const std::string& record_name,    size_t, float*, const TagList& );
+template void SimulationResults::write_inputevents_onlytimes<double>( const std::string& populationname, int index, const std::string& record_name,    size_t, double*, const TagList& );
+
+template void SimulationResults::write_inputevents_onlytimes<VecInt::iterator>( const std::string& populationname, int index, const std::string& record_name,    VecInt::iterator it, VecInt::iterator end, const TagList& );
+template void SimulationResults::write_inputevents_onlytimes<VecLong::iterator>( const std::string& populationname, int index, const std::string& record_name,   VecLong::iterator it, VecLong::iterator end, const TagList& );
+template void SimulationResults::write_inputevents_onlytimes<VecFloat::iterator>( const std::string& populationname, int index, const std::string& record_name,  VecFloat::iterator it, VecFloat::iterator end, const TagList& );
+template void SimulationResults::write_inputevents_onlytimes<VecDouble::iterator>( const std::string& populationname, int index, const std::string& record_name, VecDouble::iterator it, VecDouble::iterator end, const TagList& );
+
+template void SimulationResults::write_inputevents_onlytimes<ListInt::iterator>( const std::string& populationname, int index, const std::string& record_name,    ListInt::iterator it,     ListInt::iterator end, const TagList& );
+template void SimulationResults::write_inputevents_onlytimes<ListLong::iterator>( const std::string& populationname, int index, const std::string& record_name,   ListLong::iterator it,   ListLong::iterator end, const TagList& );
+template void SimulationResults::write_inputevents_onlytimes<ListFloat::iterator>( const std::string& populationname, int index, const std::string& record_name,  ListFloat::iterator it,  ListFloat::iterator end, const TagList& );
+template void SimulationResults::write_inputevents_onlytimes<ListDouble::iterator>( const std::string& populationname, int index, const std::string& record_name, ListDouble::iterator it, ListDouble::iterator end, const TagList& );
+
+
 template void SimulationResults::write_outputevents_byobjects<VecEventInt0::iterator>( const std::string& , int , const std::string&, VecEventInt0::iterator, VecEventInt0::iterator, const TagList&);
 template void SimulationResults::write_outputevents_byobjects<VecEventInt1::iterator>( const std::string& , int , const std::string&, VecEventInt1::iterator, VecEventInt1::iterator, const TagList&);
 template void SimulationResults::write_outputevents_byobjects<VecEventInt2::iterator>( const std::string& , int , const std::string&, VecEventInt2::iterator, VecEventInt2::iterator, const TagList&);
@@ -201,33 +217,108 @@ template void SimulationResults::write_outputevents_byobjects<ListEventDouble4::
 
 
 
-template void SimulationResults::write_inputevents_onlytimes<int>( const std::string& populationname, int index, const std::string& record_name,    size_t, int*, const TagList& );
-template void SimulationResults::write_inputevents_onlytimes<long>( const std::string& populationname, int index, const std::string& record_name,    size_t, long*, const TagList& );
-template void SimulationResults::write_inputevents_onlytimes<float>( const std::string& populationname, int index, const std::string& record_name,    size_t, float*, const TagList& );
-template void SimulationResults::write_inputevents_onlytimes<double>( const std::string& populationname, int index, const std::string& record_name,    size_t, double*, const TagList& );
-
-template void SimulationResults::write_inputevents_onlytimes<VecInt::iterator>( const std::string& populationname, int index, const std::string& record_name,    VecInt::iterator it, VecInt::iterator end, const TagList& );
-template void SimulationResults::write_inputevents_onlytimes<VecLong::iterator>( const std::string& populationname, int index, const std::string& record_name,   VecLong::iterator it, VecLong::iterator end, const TagList& );
-template void SimulationResults::write_inputevents_onlytimes<VecFloat::iterator>( const std::string& populationname, int index, const std::string& record_name,  VecFloat::iterator it, VecFloat::iterator end, const TagList& );
-template void SimulationResults::write_inputevents_onlytimes<VecDouble::iterator>( const std::string& populationname, int index, const std::string& record_name, VecDouble::iterator it, VecDouble::iterator end, const TagList& );
-
-template void SimulationResults::write_inputevents_onlytimes<ListInt::iterator>( const std::string& populationname, int index, const std::string& record_name,    ListInt::iterator it,     ListInt::iterator end, const TagList& );
-template void SimulationResults::write_inputevents_onlytimes<ListLong::iterator>( const std::string& populationname, int index, const std::string& record_name,   ListLong::iterator it,   ListLong::iterator end, const TagList& );
-template void SimulationResults::write_inputevents_onlytimes<ListFloat::iterator>( const std::string& populationname, int index, const std::string& record_name,  ListFloat::iterator it,  ListFloat::iterator end, const TagList& );
-template void SimulationResults::write_inputevents_onlytimes<ListDouble::iterator>( const std::string& populationname, int index, const std::string& record_name, ListDouble::iterator it, ListDouble::iterator end, const TagList& );
 
 
 
 
 
 
-/*
-template<typename DATATYPE> void SimulationResults::write_inputeventsNEW( const std::string& populationname, int index, const std::string& record_name, size_t n_events, DATATYPE*, const TagList& tags=TagList() );
-template<typename FwdIt> void SimulationResults::write_inputeventsNEW( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() );
-template<typename FwdIt> void SimulationResults::write_inputeventsNEW2(const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() );
-*/
+typedef InputEventType<EventInt0> InEventInt0;
+typedef InputEventType<EventInt1> InEventInt1;
+typedef InputEventType<EventInt2> InEventInt2;
+typedef InputEventType<EventInt3> InEventInt3;
+typedef InputEventType<EventInt4> InEventInt4;
+
+typedef InputEventType<EventLong0> InEventLong0;
+typedef InputEventType<EventLong1> InEventLong1;
+typedef InputEventType<EventLong2> InEventLong2;
+typedef InputEventType<EventLong3> InEventLong3;
+typedef InputEventType<EventLong4> InEventLong4;
+
+typedef InputEventType<EventFloat0> InEventFloat0;
+typedef InputEventType<EventFloat1> InEventFloat1;
+typedef InputEventType<EventFloat2> InEventFloat2;
+typedef InputEventType<EventFloat3> InEventFloat3;
+typedef InputEventType<EventFloat4> InEventFloat4;
+
+typedef InputEventType<EventDouble0> InEventDouble0;
+typedef InputEventType<EventDouble1> InEventDouble1;
+typedef InputEventType<EventDouble2> InEventDouble2;
+typedef InputEventType<EventDouble3> InEventDouble3;
+typedef InputEventType<EventDouble4> InEventDouble4;
+
+typedef vector<InEventInt0> VecInEventInt0;
+typedef vector<InEventInt1> VecInEventInt1;
+typedef vector<InEventInt2> VecInEventInt2;
+typedef vector<InEventInt3> VecInEventInt3;
+typedef vector<InEventInt4> VecInEventInt4;
+
+typedef vector<InEventLong0> VecInEventLong0;
+typedef vector<InEventLong1> VecInEventLong1;
+typedef vector<InEventLong2> VecInEventLong2;
+typedef vector<InEventLong3> VecInEventLong3;
+typedef vector<InEventLong4> VecInEventLong4;
+
+typedef vector<InEventFloat0> VecInEventFloat0;
+typedef vector<InEventFloat1> VecInEventFloat1;
+typedef vector<InEventFloat2> VecInEventFloat2;
+typedef vector<InEventFloat3> VecInEventFloat3;
+typedef vector<InEventFloat4> VecInEventFloat4;
+
+typedef vector<InEventDouble0> VecInEventDouble0;
+typedef vector<InEventDouble1> VecInEventDouble1;
+typedef vector<InEventDouble2> VecInEventDouble2;
+typedef vector<InEventDouble3> VecInEventDouble3;
+typedef vector<InEventDouble4> VecInEventDouble4;
+
+typedef list<InEventInt0> ListInEventInt0;
+typedef list<InEventInt1> ListInEventInt1;
+typedef list<InEventInt2> ListInEventInt2;
+typedef list<InEventInt3> ListInEventInt3;
+typedef list<InEventInt4> ListInEventInt4;
+
+typedef list<InEventLong0> ListInEventLong0;
+typedef list<InEventLong1> ListInEventLong1;
+typedef list<InEventLong2> ListInEventLong2;
+typedef list<InEventLong3> ListInEventLong3;
+typedef list<InEventLong4> ListInEventLong4;
+
+typedef list<InEventFloat0> ListInEventFloat0;
+typedef list<InEventFloat1> ListInEventFloat1;
+typedef list<InEventFloat2> ListInEventFloat2;
+typedef list<InEventFloat3> ListInEventFloat3;
+typedef list<InEventFloat4> ListInEventFloat4;
+
+typedef list<InEventDouble0> ListInEventDouble0;
+typedef list<InEventDouble1> ListInEventDouble1;
+typedef list<InEventDouble2> ListInEventDouble2;
+typedef list<InEventDouble3> ListInEventDouble3;
+typedef list<InEventDouble4> ListInEventDouble4;
 
 
+template void SimulationResults::write_inputevents_byobjects<VecEventInt0::iterator>( const std::string& , int , const std::string&, VecEventInt0::iterator, VecEventInt0::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventInt1::iterator>( const std::string& , int , const std::string&, VecEventInt1::iterator, VecEventInt1::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventInt2::iterator>( const std::string& , int , const std::string&, VecEventInt2::iterator, VecEventInt2::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventInt3::iterator>( const std::string& , int , const std::string&, VecEventInt3::iterator, VecEventInt3::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventInt4::iterator>( const std::string& , int , const std::string&, VecEventInt4::iterator, VecEventInt4::iterator, const TagList&);
+
+template void SimulationResults::write_inputevents_byobjects<VecEventLong0::iterator>( const std::string& , int , const std::string&, VecEventLong0::iterator, VecEventLong0::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventLong1::iterator>( const std::string& , int , const std::string&, VecEventLong1::iterator, VecEventLong1::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventLong2::iterator>( const std::string& , int , const std::string&, VecEventLong2::iterator, VecEventLong2::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventLong3::iterator>( const std::string& , int , const std::string&, VecEventLong3::iterator, VecEventLong3::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventLong4::iterator>( const std::string& , int , const std::string&, VecEventLong4::iterator, VecEventLong4::iterator, const TagList&);
+
+template void SimulationResults::write_inputevents_byobjects<VecEventFloat0::iterator>( const std::string& , int , const std::string&, VecEventFloat0::iterator, VecEventFloat0::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventFloat1::iterator>( const std::string& , int , const std::string&, VecEventFloat1::iterator, VecEventFloat1::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventFloat2::iterator>( const std::string& , int , const std::string&, VecEventFloat2::iterator, VecEventFloat2::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventFloat3::iterator>( const std::string& , int , const std::string&, VecEventFloat3::iterator, VecEventFloat3::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventFloat4::iterator>( const std::string& , int , const std::string&, VecEventFloat4::iterator, VecEventFloat4::iterator, const TagList&);
+
+template void SimulationResults::write_inputevents_byobjects<VecEventDouble0::iterator>( const std::string& , int , const std::string&, VecEventDouble0::iterator, VecEventDouble0::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventDouble1::iterator>( const std::string& , int , const std::string&, VecEventDouble1::iterator, VecEventDouble1::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventDouble2::iterator>( const std::string& , int , const std::string&, VecEventDouble2::iterator, VecEventDouble2::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventDouble3::iterator>( const std::string& , int , const std::string&, VecEventDouble3::iterator, VecEventDouble3::iterator, const TagList&);
+template void SimulationResults::write_inputevents_byobjects<VecEventDouble4::iterator>( const std::string& , int , const std::string&, VecEventDouble4::iterator, VecEventDouble4::iterator, const TagList&);
 
 
 
