@@ -2,7 +2,7 @@
 
 
 env = Environment(
-    CPPFLAGS = "-Wall -Werror -O3 -std=c++0x ",
+    CPPFLAGS = "-Wall -Werror -O3 -std=c++0x -g -Wfatal-errors",
     LIBS = ['hdf5', 'hdf5_hl']   
     )
 env.Append(CPPPATH = ['include/'])

@@ -70,7 +70,7 @@ void SimulationResults::write_trace( const std::string& populationname, int inde
     // Add the tags to the node-group:
     pNodeGroup->add_attribute("hdf-jive", "trace");
     if(tags.size() != 0) pNodeGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ","));
-    
+
     // Soft-link the time:
     pDataGroup->create_softlink(times->get_dataset(), "time");
 
@@ -88,12 +88,12 @@ void SimulationResults::write_trace( const std::string& populationname, int inde
     // Copy the data into a vector, so that its contiguous:
     vector<T> data(it, end);
     assert(data.size() == times->get_size());
-    
+
     write_trace<T>(populationname, index, record_name, times,  &data[0], tags);
 }
 
 
-                
+
 template<typename FwdIt>
 SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(FwdIt it, FwdIt end)
 {
@@ -101,7 +101,7 @@ SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(FwdIt it, FwdIt 
 
     // Copy the data into a vector, so that its contiguous:
     vector<T> data(it, end);
-    
+
     return write_shared_time_buffer<T>(data.size(), &(data[0]));
 }
 
@@ -127,7 +127,7 @@ void SimulationResults::write_outputevents( const std::string& populationname, i
 
     // Create a dataset here with the data:
     HDF5DataSet2DStdPtr pDataSet = pGroup->create_empty_dataset2D(record_name, HDF5DataSet2DStdSettings(1, H5T_NATIVE_FLOAT) );
-    pDataSet->set_data( times.size(), 1, times.get_data_pointer());    
+    pDataSet->set_data( times.size(), 1, times.get_data_pointer());
 }
 
 
@@ -145,7 +145,7 @@ void SimulationResults::write_inputevents( const std::string& populationname, in
 
     // Create a dataset here with the data:
     HDF5DataSet2DStdPtr pDataSet = pGroup->create_empty_dataset2D(record_name, HDF5DataSet2DStdSettings(1, H5T_NATIVE_FLOAT) );
-    pDataSet->set_data( times.size(), 1, times.get_data_pointer());    
+    pDataSet->set_data( times.size(), 1, times.get_data_pointer());
 }
 
 
@@ -179,10 +179,25 @@ SimulationResultsPtr SimulationResultsFile::Simulation(const std::string& simula
 
  // Simple, a pointer to an array of spike-times:
 template<typename TIMEDATATYPE>
-void SimulationResults::write_outputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, size_t n_events, TIMEDATATYPE*, const TagList& tags)
+void SimulationResults::write_outputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, size_t n_events, TIMEDATATYPE* times, const TagList& tags)
 {
-    //assert(0);
-    cout << "Not saving!!";
+
+    HDF5GroupPtr pGroup = pSimulationGroup
+    ->get_group(populationname)
+    ->get_group((boost::format("%04d")%index).str() )
+    ->get_group("output_events")
+    ->get_group(record_name);
+
+    // Add the tags to the node-group:
+    pGroup->add_attribute("hdf-jive", "events");
+    pGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
+
+    // Create a dataset here with the data:
+    HDF5DataSet1DStdPtr pDataSet = pGroup->create_empty_dataset1D("event_times", HDF5DataSet1DStdSettings( CPPTypeToHDFType<TIMEDATATYPE>::get_hdf_type() ) );
+    if(n_events > 0)
+    {
+        pDataSet->set_data( n_events, times);
+    }
 }
 
 
@@ -196,45 +211,71 @@ void SimulationResults::write_outputevents_onlytimes( const std::string& populat
     write_outputevents_onlytimes( populationname, index, record_name, data.size(), &data[0], tags);
 }
 
-
-
-
-
-
-
-
 // B. With parameters, storing events as objects:
 template<typename FwdIt>
 void SimulationResults::write_outputevents_byobjects(const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags )
 {
-assert(0);
+    typedef typename std::iterator_traits<FwdIt>::value_type EVENTTYPE;
+
+    HDF5GroupPtr pGroup = pSimulationGroup
+    ->get_group(populationname)
+    ->get_group((boost::format("%04d")%index).str() )
+    ->get_group("output_events")
+    ->get_group(record_name);
+
+    // Add the tags to the node-group:
+    pGroup->add_attribute("hdf-jive", "events");
+    pGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
+
+
+    typedef typename EVENTTYPE::DATATYPE DTYPE;
+
+    int n_params = 0;
+    // Create a dataset here with the data:
+    HDF5DataSet1DStdPtr pEventTimes = pGroup->create_empty_dataset1D("event_times",    HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type() ) );
+    HDF5DataSet2DStdPtr pEventData  = pGroup->create_empty_dataset2D("event_payloads", HDF5DataSet2DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type(), n_params  ) );
+
+
+
+
+    //if(n_events > 0)
+    //{
+
+    //    //pDataSet->set_data( n_events, times);
+    //}
+
+    //assert(0);
+    cout << "ERROR Not saving!!";
 }
 
 
 
-/** 
+/**
  *  Saving 'input' events. These are in general similar to the 'output' event, but they can also contain a reference to the 'output' event that caused it:
  */
 
  // A. With no parameters (no reference to input events):
  // i. Simple, a pointer to an array of spike-times:
-template<typename DATATYPE> void SimulationResults::write_inputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, size_t n_events, DATATYPE*, const TagList& tags )
+template<typename DATATYPE> void SimulationResults::write_inputevents_onlytimes(const std::string& populationname, int index, const std::string& record_name, size_t n_events, DATATYPE*, const TagList& tags )
 {
-    assert(0);
+    //assert(0);
+    cout << "ERROR Not saving!!";
 }
 
 
 // ii. STL container of times
-template<typename FwdIt> void SimulationResults::write_inputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags)
+template<typename FwdIt> void SimulationResults::write_inputevents_onlytimes(const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags)
 {
-    assert(0);
+    //assert(0);
+    cout << "ERROR Not saving!!";
 }
 
 
 // B. With parameters, storing events as objects:
 template<typename FwdIt> void SimulationResults::write_inputevents_byobjects(const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags )
 {
-    assert(0);
+    //assert(0);
+    cout << "ERROR Not saving!!";
 }
 
 

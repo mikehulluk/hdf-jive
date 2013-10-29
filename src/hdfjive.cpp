@@ -432,8 +432,14 @@ void HDF5DataSet1DStd::set_data(size_t n, const long* pData)
 
 
 
-void HDF5Group::add_attribute(const string& name, const string& value)
+void HDF5Group::add_attribute(const string& name, const string& value_in)
 {
+    std::string value = value_in;
+    if( value.size() == 0)
+    {
+        value = " ";
+    }
+    
     hid_t datatype_id = H5Tcopy (H5T_C_S1);
     H5Tset_size (datatype_id, value.size());
 

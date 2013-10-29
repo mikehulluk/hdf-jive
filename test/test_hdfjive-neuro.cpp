@@ -69,7 +69,7 @@ void test_output_events_1()
     vector<float>pTimes2STL(pTimes2, pTimes2+5);
     list<double> pTimes3STL(pTimes3, pTimes3+5);
 
-    SimulationResultsPtr output = SimulationResultsFile("MyResults4.hdf").Simulation("Sim1");
+    SimulationResultsPtr output = SimulationResultsFile("MyResults3.hdf").Simulation("Sim1");
 
     output->write_outputevents_onlytimes("population-dINs-RHS", 0, "out_evts_0_vec", 5, pTimes0 );
     output->write_outputevents_onlytimes("population-dINs-RHS", 0, "out_evts_1_ptr", 5, pTimes1 );
@@ -123,7 +123,7 @@ void test_output_events_2()
     evts_2_list.push_back(evt2_a); evts_2_list.push_back(evt2_b); evts_2_list.push_back(evt2_c);
     
     
-    SimulationResultsPtr output = SimulationResultsFile("MyResults2.hdf").Simulation("Sim1");
+    SimulationResultsPtr output = SimulationResultsFile("MyResults4.hdf").Simulation("Sim1");
 
     output->write_outputevents_byobjects("population-dINs-RHS", 0, "evts_0_vec", evts_0_vec.begin(), evts_0_vec.end() );
     output->write_outputevents_byobjects("population-dINs-RHS", 0, "evts_0_list", evts_0_list.begin(), evts_0_list.end() );
@@ -158,7 +158,7 @@ void test_input_events_1()
     vector<float> pTimes2STL(pTimes2, pTimes2+5);
     list<double>  pTimes3STL(pTimes3, pTimes3+5);
 
-    SimulationResultsPtr output = SimulationResultsFile("MyResults4.hdf").Simulation("Sim1");
+    SimulationResultsPtr output = SimulationResultsFile("MyResults5.hdf").Simulation("Sim1");
 
     output->write_inputevents_onlytimes("population-dINs-RHS", 0, "in_evts_0_vec", 5, pTimes0 );
     output->write_inputevents_onlytimes("population-dINs-RHS", 0, "in_evts_1_ptr", 5, pTimes1 );
@@ -218,7 +218,7 @@ void test_input_events_3()
     evts_2_list.push_back(evt2_a); evts_2_list.push_back(evt2_b); evts_2_list.push_back(evt2_c);
     
     
-    SimulationResultsPtr output = SimulationResultsFile("MyResults2.hdf").Simulation("Sim1");
+    SimulationResultsPtr output = SimulationResultsFile("MyResults6.hdf").Simulation("Sim1");
 
     output->write_outputevents_byobjects("population-dINs-RHS", 0, "out_evts_0_vec", evts_0_vec.begin(), evts_0_vec.end() );
     output->write_outputevents_byobjects("population-dINs-RHS", 0, "out_evts_0_list", evts_0_list.begin(), evts_0_list.end() );
@@ -267,9 +267,9 @@ int main(int argc, char* argv[])
     test_output_events_2();
     test_output_events_3();
 
-    test_input_events_1();
-    test_input_events_2();
-    test_input_events_3();
+    //test_input_events_1();
+    //test_input_events_2();
+    //test_input_events_3();
     
     
 }

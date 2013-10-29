@@ -14,9 +14,14 @@ using namespace std;
 
 
 
-template<typename DATATYPE, int NPARAMS>
+template<typename DATATYPE_, int NPARAMS_>
 class EventType
 {
+public:
+    typedef DATATYPE_ DATATYPE;
+    const static int NPARAMS = NPARAMS_;
+
+private:
     size_t event_index;
     DATATYPE time;
     std::array<DATATYPE, NPARAMS> parameters;
