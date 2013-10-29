@@ -306,7 +306,7 @@ class HDFManager
         }
         ~HDFManager()
         {
-            cout << "\n~HDFManager:";
+            //cout << "\n~HDFManager:";
         }
 
 

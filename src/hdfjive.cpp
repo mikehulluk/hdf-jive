@@ -684,20 +684,20 @@ void HDF5File::init()
 HDF5File::HDF5File(const string& filename)
         : filename(filename)
 {
-        cout << "HDFFile( " << filename << " )";
+        //cout << "HDFFile( " << filename << " )";
         file_id = H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 }
 
 
 HDF5File::~HDF5File()
 {
-    cout << "\nClosing HDF file: " << filename << "\n";
+    //cout << "\nClosing HDF file: " << filename << "\n";
     //cout << "\n - Releasing groups: ";
     root_group.reset();
 
     //cout << "\n - Releasing handle";
     H5Fclose(this->file_id);
-    cout << "\n(OK)" << std::flush;
+    //cout << "\n(OK)" << std::flush;
 }
 
 

@@ -21,7 +21,7 @@ using namespace std;
 
 
 #include "hdfjive.h"
-#include "hdfjive-events.h"
+//#include "hdfjive-events.h"
 
 
 #include <boost/format.hpp>
@@ -103,11 +103,14 @@ public:
     template<typename TIMEDATATYPE>
     void write_trace(const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, TIMEDATATYPE* pData, const TagList& tags=TagList());
 
+
     /**
      * Record a trace to the hdfjive file from an STL container. The length of the container should be the same as the time-buffer.
      */
     template<typename FwdIt>
     void write_trace(const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, FwdIt it, FwdIt end, const TagList& tags=TagList());
+
+
 
 
 
@@ -117,13 +120,34 @@ public:
 
      // A. With no parameters:
      // i. Simple, a pointer to an array of spike-times:
-    template<typename DATATYPE> void write_outputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, size_t n_events, DATATYPE*, const TagList& tags=TagList() );
+    template<typename DATATYPE> void write_outputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, size_t n_events, DATATYPE* times, const TagList& tags=TagList() )
+    {
+        HDF5GroupPtr pGroup = pSimulationGroup
+        ->get_group(populationname)
+        ->get_group((boost::format("%04d")%index).str() )
+        ->get_group("output_events")
+        ->get_group(record_name);
+
+        // Add the tags to the node-group:
+        pGroup->add_attribute("hdf-jive", "events");
+        pGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
+
+        // Create a dataset here with the data:
+        HDF5DataSet1DStdPtr pDataSet = pGroup->create_empty_dataset1D("event_times", HDF5DataSet1DStdSettings( CPPTypeToHDFType<DATATYPE>::get_hdf_type() ) );
+        if(n_events > 0)
+        {
+            pDataSet->set_data( n_events, times);
+        }
+    }
+
     // ii. STL container of times
     template<typename FwdIt>
-    void write_outputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() );
-
-
-
+    void write_outputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() )
+    {
+        typedef typename std::iterator_traits<FwdIt>::value_type T;
+        vector<T> data( it, end);
+        write_outputevents_onlytimes( populationname, index, record_name, data.size(), &data[0], tags);
+    }
 
 
     template<typename EXTRACTORTYPE, typename FwdIt>
@@ -171,10 +195,6 @@ public:
             HDF5DataSet1DStdPtr pEventData  = pGroup->create_empty_dataset1D(pname, HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type()  ) );
             pEventData->set_data(n_events, parameters[p] );
         }
-
-        cout << "\n\nH YEAH!";
-
-
     }
 
 
@@ -183,12 +203,36 @@ public:
     /**
      *  Saving 'input' events. These are in general similar to the 'output' event, but they can also contain a reference to the 'output' event that caused it:
      */
-
      // A. With no parameters (no reference to input events):
      // i. Simple, a pointer to an array of spike-times:
-    template<typename DATATYPE> void write_inputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, size_t n_events, DATATYPE*, const TagList& tags=TagList() );
+    template<typename DATATYPE> void write_inputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, size_t n_events, DATATYPE* times, const TagList& tags=TagList() )
+    {
+        HDF5GroupPtr pGroup = pSimulationGroup
+        ->get_group(populationname)
+        ->get_group((boost::format("%04d")%index).str() )
+        ->get_group("output_events")
+        ->get_group(record_name);
+
+        // Add the tags to the node-group:
+        pGroup->add_attribute("hdf-jive", "events");
+        pGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
+
+        // Create a dataset here with the data:
+        HDF5DataSet1DStdPtr pDataSet = pGroup->create_empty_dataset1D("event_times", HDF5DataSet1DStdSettings( CPPTypeToHDFType<DATATYPE>::get_hdf_type() ) );
+        if(n_events > 0)
+        {
+            pDataSet->set_data( n_events, times);
+        }
+        
+    }
+    
     // ii. STL container of times
-    template<typename FwdIt> void write_inputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() );
+    template<typename FwdIt> void write_inputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() )
+    {
+        typedef typename std::iterator_traits<FwdIt>::value_type T;
+        vector<T> data( it, end);
+        write_outputevents_onlytimes( populationname, index, record_name, data.size(), &data[0], tags);
+    }
 
     // B. With parameters, storing events as objects:
     template<typename EXTRACTORTYPE, typename FwdIt>
@@ -213,7 +257,7 @@ public:
         const size_t n_params = EXTRACTORTYPE::NPARAMS;
         const size_t n_events = std::distance(start,stop);
 
-        // Copy all the data into indivudla arrays:
+        // Copy all the data into individual arrays:
         DTYPE times[n_events];
         DTYPE parameters[n_events][n_params];
 
@@ -236,12 +280,8 @@ public:
             pEventData->set_data(n_events, parameters[p] );
         }
 
-        cout << "\n\nH YEAH!";
 
         int sources[n_events][4];
-
-
-
         for(FwdIt it=start; it!= stop;it++, i++)
         {
             for(size_t x=0;x<EXTRACTORTYPE::NSRCINDICES;x++)
@@ -252,7 +292,6 @@ public:
 
         HDF5DataSet2DStdPtr pEventSrcs  = pGroup->create_empty_dataset2D("srcs", HDF5DataSet2DStdSettings( CPPTypeToHDFType<int>::get_hdf_type(), 4) );
         pEventSrcs->set_data(n_events, 4, &sources[0][0]);
-
     }
 
 

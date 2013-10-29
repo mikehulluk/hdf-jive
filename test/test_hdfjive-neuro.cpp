@@ -435,64 +435,6 @@ void test_input_events_3()
 
 
 
-struct MyEvent
-{
-    float time;
-    float param1;
-    float param2;
-};
-
-
-
-
-struct MyEventExtractor
-{
-    typedef MyEvent EVENTTYPE;
-    typedef double DTYPE;
-    static const int NPARAMS = 2;
-
-    static DTYPE get_time(const EVENTTYPE& o) { return o.time; }
-    static DTYPE get_parameter_value(const EVENTTYPE& o, int i) { switch(i){ case 0: return o.param1; case 1: return o.param2; default: assert(0); } }
-    static string get_parameter_name( int i) { switch(i){ case 0: return "param1"; case 1: return "asd";    default: assert(0); } }
-};
-
-
-
-
-
-template<typename ExtractorType>
-void myfunction(const typename ExtractorType::EVENTTYPE& evt)
-{
-    for(int i=0;i<ExtractorType::NPARAMS;i++)
-    {
-        cout << "\n" << ExtractorType::get_parameter_name(i) <<  " " << ExtractorType::get_parameter_value(evt, i);
-     }
-}
-
-
-
-
-
-void test_input_events_4()
-{
-
-    MyEvent o;
-    myfunction<MyEventExtractor>(o);
-
-
-    vector<MyEvent> evts;
-    evts.push_back(o);
-
-    SimulationResultsPtr output = SimulationResultsFile("MyResults6.hdf").Simulation("Sim1");
-    output->write_outputevents_byobjects_extractor<MyEventExtractor>( ",,",0,"ll", evts.begin(), evts.end() );
-
-
-
-}
-
-
-
-
 
 int main(int argc, char* argv[])
 {
@@ -506,8 +448,4 @@ int main(int argc, char* argv[])
     test_input_events_1();
     test_input_events_2();
     test_input_events_3();
-
-
-
-    test_input_events_4();
 }
