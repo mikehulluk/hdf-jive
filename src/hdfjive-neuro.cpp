@@ -2,6 +2,7 @@
 #include "hdfjive.h"
 #include "hdfjive-neuro.h"
 
+#include <iterator>
 
 #include <boost/format.hpp>
 #include <boost/algorithm/string/join.hpp>
@@ -24,7 +25,7 @@ template<typename TIMEDATATYPE>
 SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(size_t length, TIMEDATATYPE* pData)
 {
     const std::string& array_name = (boost::format("time_array%01d")%n_shared_time_buffers++).str();
-    HDF5DataSet2DStdPtr pDataSet = pSimulationGroup->get_group("shared_time_arrays")->create_empty_dataset2D(array_name, HDF5DataSet2DStdSettings(1, CPPTypeToHDFType<TIMEDATATYPE>::get_hdf_type() ) );
+    HDF5DataSet2DStdPtr pDataSet = pSimulationGroup->get_group("shared_time_arrays")->create_empty_dataset2D(array_name, HDF5DataSet2DStdSettings(CPPTypeToHDFType<TIMEDATATYPE>::get_hdf_type(), 1));
     pDataSet->set_data( length, 1, pData);
 
     return SharedTimeBufferPtr(new SharedTimeBuffer(pDataSet) );
@@ -75,7 +76,7 @@ void SimulationResults::write_trace( const std::string& populationname, int inde
     pDataGroup->create_softlink(times->get_dataset(), "time");
 
     // Create the data:
-    HDF5DataSet2DStdPtr pDataSet = pDataGroup->create_empty_dataset2D("data", HDF5DataSet2DStdSettings(1, CPPTypeToHDFType<TIMEDATATYPE>::get_hdf_type()) );
+    HDF5DataSet2DStdPtr pDataSet = pDataGroup->create_empty_dataset2D("data", HDF5DataSet2DStdSettings(CPPTypeToHDFType<TIMEDATATYPE>::get_hdf_type(), 1));
     pDataSet->set_data( times->get_size(), 1, pData);
 }
 
@@ -126,7 +127,7 @@ void SimulationResults::write_outputevents( const std::string& populationname, i
     pGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
 
     // Create a dataset here with the data:
-    HDF5DataSet2DStdPtr pDataSet = pGroup->create_empty_dataset2D(record_name, HDF5DataSet2DStdSettings(1, H5T_NATIVE_FLOAT) );
+    HDF5DataSet2DStdPtr pDataSet = pGroup->create_empty_dataset2D(record_name, HDF5DataSet2DStdSettings(H5T_NATIVE_FLOAT, 1) );
     pDataSet->set_data( times.size(), 1, times.get_data_pointer());
 }
 
@@ -144,7 +145,7 @@ void SimulationResults::write_inputevents( const std::string& populationname, in
     pGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
 
     // Create a dataset here with the data:
-    HDF5DataSet2DStdPtr pDataSet = pGroup->create_empty_dataset2D(record_name, HDF5DataSet2DStdSettings(1, H5T_NATIVE_FLOAT) );
+    HDF5DataSet2DStdPtr pDataSet = pGroup->create_empty_dataset2D(record_name, HDF5DataSet2DStdSettings(H5T_NATIVE_FLOAT, 1) );
     pDataSet->set_data( times.size(), 1, times.get_data_pointer());
 }
 
@@ -213,7 +214,7 @@ void SimulationResults::write_outputevents_onlytimes( const std::string& populat
 
 // B. With parameters, storing events as objects:
 template<typename FwdIt>
-void SimulationResults::write_outputevents_byobjects(const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags )
+void SimulationResults::write_outputevents_byobjects(const std::string& populationname, int index, const std::string& record_name, FwdIt start, FwdIt stop, const TagList& tags )
 {
     typedef typename std::iterator_traits<FwdIt>::value_type EVENTTYPE;
 
@@ -230,23 +231,35 @@ void SimulationResults::write_outputevents_byobjects(const std::string& populati
 
     typedef typename EVENTTYPE::DATATYPE DTYPE;
 
-    int n_params = 0;
-    // Create a dataset here with the data:
-    HDF5DataSet1DStdPtr pEventTimes = pGroup->create_empty_dataset1D("event_times",    HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type() ) );
-    HDF5DataSet2DStdPtr pEventData  = pGroup->create_empty_dataset2D("event_payloads", HDF5DataSet2DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type(), n_params  ) );
+    const size_t n_params = EVENTTYPE::NPARAMS;
+    const size_t n_events = std::distance(start,stop);
+
+    // Copy all the data into indivudla arrays:
+    DTYPE times[n_events];
+    DTYPE parameters[n_events][n_params];
+
+    size_t i=0;
+    for(FwdIt it=start; it!= stop;it++, i++)
+    {
+        times[i] = it->time;
+        for(size_t p=0;p<n_params;p++)
+            (parameters[p])[i] = it->parameters[i];
+    }
 
 
+    // Create datasets with the data:
+    HDF5DataSet1DStdPtr pEventTimes = pGroup->create_empty_dataset1D("times",    HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type() ) );
+    pEventTimes->set_data(n_events, times);
 
-
-    //if(n_events > 0)
-    //{
-
-    //    //pDataSet->set_data( n_events, times);
-    //}
-
-    //assert(0);
-    cout << "ERROR Not saving!!";
+    for(size_t p=0;p<n_params;p++)
+    {
+        string pname = (boost::format("param-%d")%p).str();
+        HDF5DataSet1DStdPtr pEventData  = pGroup->create_empty_dataset1D(pname, HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type()  ) );
+        pEventData->set_data(n_events, parameters[p] );
+    }
 }
+
+
 
 
 
@@ -263,18 +276,76 @@ template<typename DATATYPE> void SimulationResults::write_inputevents_onlytimes(
 }
 
 
+
+
+
 // ii. STL container of times
-template<typename FwdIt> void SimulationResults::write_inputevents_onlytimes(const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags)
+template<typename FwdIt> void SimulationResults::write_inputevents_onlytimes(const std::string& populationname, int index, const std::string& record_name, FwdIt start, FwdIt stop, const TagList& tags)
 {
     //assert(0);
     cout << "ERROR Not saving!!";
 }
 
 
+
+
 // B. With parameters, storing events as objects:
-template<typename FwdIt> void SimulationResults::write_inputevents_byobjects(const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags )
+template<typename FwdIt> void SimulationResults::write_inputevents_byobjects(const std::string& populationname, int index, const std::string& record_name, FwdIt start, FwdIt stop, const TagList& tags )
 {
-    //assert(0);
+    typedef typename std::iterator_traits<FwdIt>::value_type INEVENTTYPE;
+
+    HDF5GroupPtr pGroup = pSimulationGroup
+    ->get_group(populationname)
+    ->get_group((boost::format("%04d")%index).str() )
+    ->get_group("input_events")
+    ->get_group(record_name);
+
+    // Add the tags to the node-group:
+    pGroup->add_attribute("hdf-jive", "events");
+    pGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
+
+
+    typedef typename INEVENTTYPE::EVENTTYPE::DATATYPE DTYPE;
+
+    const size_t n_params = INEVENTTYPE::EVENTTYPE::NPARAMS;
+    const size_t n_events = std::distance(start,stop);
+
+    // Copy all the data into individual arrays:
+    DTYPE times[n_events];
+    DTYPE parameters[n_events][n_params];
+    // Sources will be a 4xn events array
+    int sources[n_events][4];
+
+    size_t i=0;
+    for(FwdIt it=start; it!= stop;it++, i++)
+    {
+        times[i] = it->evt_details.time;
+        for(size_t p=0;p<n_params;p++)
+            (parameters[p])[i] = it->evt_details.parameters[i];
+
+        (sources[0])[i] = it->evt_src.src_population_index;
+        (sources[1])[i] = it->evt_src.src_neuron_index;
+        (sources[2])[i] = it->evt_src.src_evtport_index;
+        (sources[3])[i] = it->evt_src.src_event_index;
+
+    }
+
+    // Create datasets with the data:
+    HDF5DataSet1DStdPtr pEventTimes = pGroup->create_empty_dataset1D("times",    HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type() ) );
+    pEventTimes->set_data(n_events, times);
+
+    for(size_t p=0;p<n_params;p++)
+    {
+        string pname = (boost::format("param-%d")%p).str();
+        HDF5DataSet1DStdPtr pEventData  = pGroup->create_empty_dataset1D(pname, HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type()  ) );
+        pEventData->set_data(n_events, parameters[p] );
+    }
+    
+    HDF5DataSet2DStdPtr pEventSrcs  = pGroup->create_empty_dataset2D("srcs", HDF5DataSet2DStdSettings( CPPTypeToHDFType<int>::get_hdf_type(), 4) );
+    pEventSrcs->set_data(n_events, 4, &sources[0][0]);
+
+
+    cout << "ERROR Not saving!!";
     cout << "ERROR Not saving!!";
 }
 

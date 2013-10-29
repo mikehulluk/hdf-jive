@@ -21,7 +21,6 @@ public:
     typedef DATATYPE_ DATATYPE;
     const static int NPARAMS = NPARAMS_;
 
-private:
     size_t event_index;
     DATATYPE time;
     std::array<DATATYPE, NPARAMS> parameters;
@@ -44,11 +43,12 @@ struct SrcEventReference
 {
     size_t src_population_index;
     size_t src_neuron_index;
+    size_t src_evtport_index;
     size_t src_event_index;
 
 public:
 
-    SrcEventReference(size_t src_population_index, size_t src_neuron_index, size_t src_event_index);
+    SrcEventReference(size_t src_population_index, size_t src_neuron_index, size_t src_evtport_index, size_t src_event_index);
 };
 
 
@@ -58,15 +58,21 @@ public:
 template<typename EVENTTYPE_>
 class InputEventType
 {
+public:
+
     typedef EVENTTYPE_ EVENTTYPE;
     SrcEventReference evt_src;
     EVENTTYPE evt_details;
 
 public:
     InputEventType(const SrcEventReference& src, const EVENTTYPE& evt_details);
-
-
 };
+
+
+
+
+
+
 
 
 

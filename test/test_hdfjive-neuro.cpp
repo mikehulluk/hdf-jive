@@ -16,7 +16,7 @@ void test_pointers()
     double time_data[] = { 2.4, 5.6, 9.6, 14.3};
     float voltage_data[] = { 4.2, 6.3, 6.7, 13.4};
     int int_data[] = { 4,3,5,6 };
-    
+
     SimulationResultsPtr output = SimulationResultsFile("MyResults1.hdf").Simulation("Sim1");
     SharedTimeBufferPtr times = output->write_shared_time_buffer(4, time_data);
 
@@ -34,7 +34,7 @@ void test_stl()
     vector<double> time_data = list_of<double>(2.4)(5.6)(9.6)(14.3);
     list<float>  voltage_data = list_of<float>(4.2)(6.3)(6.7)(13.4);
     vector<int>  int_data = list_of<int>(4)(3)(5)(6);
-    
+
     SimulationResultsPtr output = SimulationResultsFile("MyResults2.hdf").Simulation("Sim1");
     SharedTimeBufferPtr times = output->write_shared_time_buffer(time_data.begin(), time_data.end());
 
@@ -75,7 +75,7 @@ void test_output_events_1()
     output->write_outputevents_onlytimes("population-dINs-RHS", 0, "out_evts_1_ptr", 5, pTimes1 );
     output->write_outputevents_onlytimes("population-dINs-RHS", 0, "out_evts_2_ptr", 5, pTimes2 );
     output->write_outputevents_onlytimes("population-dINs-RHS", 0, "out_evts_3_ptr", 5, pTimes3 );
-    
+
     output->write_outputevents_onlytimes("population-dINs-RHS", 0, "out_evts_0_stl", pTimes0STL.begin(), pTimes0STL.end() );
     output->write_outputevents_onlytimes("population-dINs-RHS", 0, "out_evts_1_stl", pTimes1STL.begin(), pTimes1STL.end() );
     output->write_outputevents_onlytimes("population-dINs-RHS", 0, "out_evts_2_stl", pTimes2STL.begin(), pTimes2STL.end() );
@@ -114,15 +114,15 @@ void test_output_events_2()
     MyEventType2 evt2_c(-1, 0.7, 47, 90);
 
 
-    // Save the events 
+    // Save the events
     evts_0_vec.push_back(evt0_a); evts_0_vec.push_back(evt0_b); evts_0_vec.push_back(evt0_c);
     evts_0_list.push_back(evt0_a); evts_0_list.push_back(evt0_b); evts_0_list.push_back(evt0_c);
     evts_1_vec.push_back(evt1_a); evts_1_vec.push_back(evt1_b); evts_1_vec.push_back(evt1_c);
     evts_1_list.push_back(evt1_a); evts_1_list.push_back(evt1_b); evts_1_list.push_back(evt1_c);
     evts_2_vec.push_back(evt2_a); evts_2_vec.push_back(evt2_b); evts_2_vec.push_back(evt2_c);
     evts_2_list.push_back(evt2_a); evts_2_list.push_back(evt2_b); evts_2_list.push_back(evt2_c);
-    
-    
+
+
     SimulationResultsPtr output = SimulationResultsFile("MyResults4.hdf").Simulation("Sim1");
 
     output->write_outputevents_byobjects("population-dINs-RHS", 0, "evts_0_vec", evts_0_vec.begin(), evts_0_vec.end() );
@@ -164,7 +164,7 @@ void test_input_events_1()
     output->write_inputevents_onlytimes("population-dINs-RHS", 0, "in_evts_1_ptr", 5, pTimes1 );
     output->write_inputevents_onlytimes("population-dINs-RHS", 0, "in_evts_2_ptr", 5, pTimes2 );
     output->write_inputevents_onlytimes("population-dINs-RHS", 0, "in_evts_3_ptr", 5, pTimes3 );
-    
+
     output->write_inputevents_onlytimes("population-dINs-RHS", 0, "in_evts_0_stl", pTimes0STL.begin(), pTimes0STL.end() );
     output->write_inputevents_onlytimes("population-dINs-RHS", 0, "in_evts_1_stl", pTimes1STL.begin(), pTimes1STL.end() );
     output->write_inputevents_onlytimes("population-dINs-RHS", 0, "in_evts_2_stl", pTimes2STL.begin(), pTimes2STL.end() );
@@ -209,15 +209,15 @@ void test_input_events_3()
     MyEventType2 evt2_c(-1, 0.7, 47, 90);
 
 
-    // Save the events 
+    // Save the events
     evts_0_vec.push_back(evt0_a); evts_0_vec.push_back(evt0_b); evts_0_vec.push_back(evt0_c);
     evts_0_list.push_back(evt0_a); evts_0_list.push_back(evt0_b); evts_0_list.push_back(evt0_c);
     evts_1_vec.push_back(evt1_a); evts_1_vec.push_back(evt1_b); evts_1_vec.push_back(evt1_c);
     evts_1_list.push_back(evt1_a); evts_1_list.push_back(evt1_b); evts_1_list.push_back(evt1_c);
     evts_2_vec.push_back(evt2_a); evts_2_vec.push_back(evt2_b); evts_2_vec.push_back(evt2_c);
     evts_2_list.push_back(evt2_a); evts_2_list.push_back(evt2_b); evts_2_list.push_back(evt2_c);
-    
-    
+
+
     SimulationResultsPtr output = SimulationResultsFile("MyResults6.hdf").Simulation("Sim1");
 
     output->write_outputevents_byobjects("population-dINs-RHS", 0, "out_evts_0_vec", evts_0_vec.begin(), evts_0_vec.end() );
@@ -237,14 +237,14 @@ void test_input_events_3()
     vector<InEventFloat2> in_evts_float2_vec;
 
     // Input events (0-param):
-    in_evts_float0_vec.push_back(InEventFloat0(SrcEventReference(0,0,0), MyEventType0(0, 1.0)));
-    in_evts_float0_vec.push_back(InEventFloat0(SrcEventReference(0,0,1), MyEventType0(1, 3.0)));
-    in_evts_float0_vec.push_back(InEventFloat0(SrcEventReference(0,0,2), MyEventType0(2, 8.0)));
+    in_evts_float0_vec.push_back(InEventFloat0(SrcEventReference(0,0,0,0), MyEventType0(0, 1.0)));
+    in_evts_float0_vec.push_back(InEventFloat0(SrcEventReference(0,0,0,1), MyEventType0(1, 3.0)));
+    in_evts_float0_vec.push_back(InEventFloat0(SrcEventReference(0,0,0,2), MyEventType0(2, 8.0)));
 
     // Input events (2-param):
-    in_evts_float2_vec.push_back(InEventFloat2(SrcEventReference(1,0,0), MyEventType2(0, 1.0, 2.3, 5.6 ) )  );
-    in_evts_float2_vec.push_back(InEventFloat2(SrcEventReference(1,0,1), MyEventType2(1, 3.0, 4.3, 5.6 ) )  );
-    in_evts_float2_vec.push_back(InEventFloat2(SrcEventReference(1,0,2), MyEventType2(2, 8.0, 7.3, 6.6 ) )  );
+    in_evts_float2_vec.push_back(InEventFloat2(SrcEventReference(1,0,0,0), MyEventType2(0, 1.0, 2.3, 5.6 ) )  );
+    in_evts_float2_vec.push_back(InEventFloat2(SrcEventReference(1,0,0,1), MyEventType2(1, 3.0, 4.3, 5.6 ) )  );
+    in_evts_float2_vec.push_back(InEventFloat2(SrcEventReference(1,0,0,2), MyEventType2(2, 8.0, 7.3, 6.6 ) )  );
 
     output->write_inputevents_byobjects("population-dINs-RHS", 0, "in_evts_0_list", in_evts_float0_vec.begin(), in_evts_float0_vec.end() );
     output->write_inputevents_byobjects("population-dINs-RHS", 0, "in_evts_2_list", in_evts_float2_vec.begin(), in_evts_float2_vec.end() );
@@ -258,18 +258,80 @@ void test_input_events_3()
 
 
 
+
+struct MyEvent
+{
+    float time;
+    float param1;
+    float param2;
+};
+
+
+
+
+struct MyEventExtractor 
+{
+    typedef MyEvent EVENTTYPE;
+    typedef double DTYPE;
+    static const int NPARAMS = 2;
+
+    static float get_time(const EVENTTYPE& o) { return o.time; }
+    static float get_parameter_value(const EVENTTYPE& o, int i) { switch(i){ case 0: return o.param1; case 1: return o.param2; default: assert(0); } }
+    static string get_parameter_name( int i) { switch(i){ case 0: return "param1"; case 1: return "asd";    default: assert(0); } }
+};
+
+
+
+
+
+template<typename ExtractorType>
+void myfunction(const typename ExtractorType::EVENTTYPE& evt)
+{
+    for(int i=0;i<ExtractorType::NPARAMS;i++)
+    {
+        cout << "\n" << ExtractorType::get_parameter_name(i) <<  " " << ExtractorType::get_parameter_value(evt, i);
+     }
+}
+
+
+
+
+
+void test_input_events_4()
+{
+
+    MyEvent o;
+    myfunction<MyEventExtractor>(o);
+
+
+    vector<MyEvent> evts;
+    evts.push_back(o);
+
+    SimulationResultsPtr output = SimulationResultsFile("MyResults6.hdf").Simulation("Sim1");
+    output->write_outputevents_byobjects_extractor<MyEventExtractor>( ",,",0,"ll", evts.begin(), evts.end() ); 
+
+
+
+}
+
+
+
+
+
 int main(int argc, char* argv[])
 {
     test_pointers();
     test_stl();
-    
+
     test_output_events_1();
     test_output_events_2();
     test_output_events_3();
 
-    //test_input_events_1();
-    //test_input_events_2();
-    //test_input_events_3();
-    
-    
+    test_input_events_1();
+    test_input_events_2();
+    test_input_events_3();
+
+
+
+    test_input_events_4();
 }

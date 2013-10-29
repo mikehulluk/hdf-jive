@@ -11,6 +11,11 @@
 #include <list>
 #include <set>
 #include <boost/enable_shared_from_this.hpp>
+
+
+#include <type_traits>
+
+
 using namespace std;
 
 
@@ -19,6 +24,8 @@ using namespace std;
 #include "hdfjive-events.h"
 
 
+#include <boost/format.hpp>
+#include <boost/algorithm/string/join.hpp>
 
 
 class SimulationResults;
@@ -115,9 +122,68 @@ public:
     template<typename FwdIt>
     void write_outputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() );
 
+
+
+    template<typename EXTRACTORTYPE, typename FwdIt>
+    void write_outputevents_byobjects_extractor(const std::string& populationname, int index, const std::string& record_name, FwdIt start, FwdIt stop, const TagList& tags=TagList() )
+    {
+        // Check that the thing being iterated over, and the extractor take the same type:
+        static_assert(std::is_same<typename std::iterator_traits<FwdIt>::value_type, typename EXTRACTORTYPE::EVENTTYPE>::value, "jklkjl"); 
+        typedef typename std::iterator_traits<FwdIt>::value_type EVENTTYPE;
+
+        HDF5GroupPtr pGroup = pSimulationGroup
+        ->get_group(populationname)
+        ->get_group((boost::format("%04d")%index).str() )
+        ->get_group("output_events")
+        ->get_group(record_name);
+
+        // Add the tags to the node-group:
+        pGroup->add_attribute("hdf-jive", "events");
+        pGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
+
+
+        typedef typename EXTRACTORTYPE::DTYPE DTYPE;
+
+        const size_t n_params = EXTRACTORTYPE::NPARAMS;
+        const size_t n_events = std::distance(start,stop);
+
+        // Copy all the data into indivudla arrays:
+        DTYPE times[n_events];
+        DTYPE parameters[n_events][n_params];
+
+        size_t i=0;
+        for(FwdIt it=start; it!= stop;it++, i++)
+        {
+            times[i] = EXTRACTORTYPE::get_time(*it);
+            for(size_t p=0;p<n_params;p++)
+                (parameters[p])[i] = EXTRACTORTYPE::get_parameter_value(*it, p);
+        }
+
+        // Create datasets with the data:
+        HDF5DataSet1DStdPtr pEventTimes = pGroup->create_empty_dataset1D("times",    HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type() ) );
+        pEventTimes->set_data(n_events, times);
+
+        for(size_t p=0;p<n_params;p++)
+        {
+            string pname = EXTRACTORTYPE::get_parameter_name(p); (boost::format("param-%d")%p).str();
+            HDF5DataSet1DStdPtr pEventData  = pGroup->create_empty_dataset1D(pname, HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type()  ) );
+            pEventData->set_data(n_events, parameters[p] );
+        }
+
+        cout << "\n\nH YEAH!";
+
+
+    }
+
+
+
+
+
+
     // B. With parameters, storing events as objects:
     template<typename FwdIt>
     void write_outputevents_byobjects(const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() );
+    
 
     // C. With parameters, storing events parameters in arrays:
     /*

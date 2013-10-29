@@ -29,6 +29,18 @@ HDF5 is a format that allows data to be stored hierachically.
 
 
 
+#Variables:
+my-simulation/my-pop/000/soma/V
+
+#Output events:
+my-simulation/my-pop/000/soma/v_trigger
+                                       /attribute:neuron_event_src_index
+---------------------------------------/event_times
+---------------------------------------/event_payloads
+
+                                 
+
+
 Quickstart
 -----------
 

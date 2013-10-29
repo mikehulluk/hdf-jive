@@ -58,6 +58,7 @@ template<> struct CPPTypeToHDFType<int> { static hid_t get_hdf_type() { return H
 template<> struct CPPTypeToHDFType<long> { static hid_t get_hdf_type() { return H5T_NATIVE_LONG; }  };
 template<> struct CPPTypeToHDFType<float> { static hid_t get_hdf_type() { return H5T_NATIVE_FLOAT; }  };
 template<> struct CPPTypeToHDFType<double> { static hid_t get_hdf_type() { return H5T_NATIVE_DOUBLE; }  };
+//template<> struct CPPTypeToHDFType<long unsigned int> { static hid_t get_hdf_type() { return H5T_NATIVE_ULONG; }  };
 
 
 
@@ -71,7 +72,7 @@ class HDF5DataSet2DStdSettings
 public:
     const size_t size;
     const hid_t type; // H5T_NATIVE_CHAR, H5T_NATIVE_SHORT, H5T_NATIVE_INT, H5T_NATIVE_LONG, H5T_NATIVE_FLOAT
-    HDF5DataSet2DStdSettings(size_t size, hid_t type)
+    HDF5DataSet2DStdSettings(hid_t type, size_t size)
         : size(size), type(type) {}
 };
 
@@ -106,12 +107,12 @@ public:
         assert(fb.size() == this->settings.size);
         this->append_buffer(fb.get_data_pointer() );
     }
-   
+
     // Single values:
     template<typename TYPE>
     inline void append_single( TYPE value)
     {
-        assert(settings.size==1); 
+        assert(settings.size==1);
         append_buffer(&value);
     }
 
@@ -119,7 +120,7 @@ public:
     void set_data(size_t m, size_t n, const float* pData);
     void set_data(size_t m, size_t n, const int* pData);
     void set_data(size_t m, size_t n, const long* pData);
-    
+
 
     std::string get_fullname() const;
 
@@ -151,7 +152,7 @@ public:
 class HDF5DataSet1DStdSettings
 {
 public:
-    
+
     const hid_t type; // H5T_NATIVE_CHAR, H5T_NATIVE_SHORT, H5T_NATIVE_INT, H5T_NATIVE_LONG, H5T_NATIVE_FLOAT
     HDF5DataSet1DStdSettings(hid_t type)
         : type(type) {}
@@ -173,13 +174,13 @@ public:
     HDF5DataSet1DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet1DStdSettings& settings);
     ~HDF5DataSet1DStd();
 
-  
+
     // Single values:
     void append(int value);
     void append(long value);
     void append(float value);
     void append(double value);
-    
+
 
     void set_data(size_t n, const double* pData);
     void set_data(size_t n, const float* pData);
@@ -191,7 +192,7 @@ public:
     {
         set_data(buff.size(), buff.get_data_pointer() );
     }
-    
+
     std::string get_fullname() const;
     size_t get_length() const;
 };
@@ -236,20 +237,20 @@ public:
     HDF5DataSet2DStdPtr create_empty_dataset2D(const string& name, const HDF5DataSet2DStdSettings& settings);
 
 
-    
+
     HDF5DataSet1DStdPtr create_dataset1D(const string& name, const FloatBuffer1D& data);
     HDF5DataSet1DStdPtr create_dataset1D(const string& name, const IntBuffer1D& data);
-    
-    
-    
-    
+
+
+
+
     HDF5DataSet1DStdPtr get_dataset1D(const string& name);
     HDF5DataSet2DStdPtr get_dataset2D(const string& name);
 
     // Links:
     void create_softlink(const  HDF5DataSet1DStdPtr& target, const std::string& name);
     void create_softlink(const  HDF5DataSet2DStdPtr& target, const std::string& name);
-    
+
     std::string get_fullname() const;
     void add_attribute(const string& name, const string& value);
 

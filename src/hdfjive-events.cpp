@@ -24,7 +24,7 @@ EventType<DATATYPE,NPARAMS>::EventType(size_t event_index, DATATYPE time, DATATY
     : event_index(event_index), time(time)
 {
     assert(NPARAMS==2);
-    parameters[0] = p0;  parameters[1] = p1; 
+    parameters[0] = p0;  parameters[1] = p1;
 }
 
 template<typename DATATYPE, int NPARAMS>
@@ -32,7 +32,7 @@ EventType<DATATYPE,NPARAMS>::EventType(size_t event_index, DATATYPE time, DATATY
     : event_index(event_index), time(time)
 {
     assert(NPARAMS==3);
-    parameters[0] = p0;  parameters[1] = p1; parameters[2] = p2; 
+    parameters[0] = p0;  parameters[1] = p1; parameters[2] = p2;
 }
 
 template<typename DATATYPE, int NPARAMS>
@@ -46,8 +46,11 @@ EventType<DATATYPE,NPARAMS>::EventType(size_t event_index, DATATYPE time, DATATY
 
 
 
-SrcEventReference::SrcEventReference(size_t src_population_index, size_t src_neuron_index, size_t src_event_index)
-: src_population_index(src_population_index), src_neuron_index(src_neuron_index), src_event_index(src_event_index)
+SrcEventReference::SrcEventReference(size_t src_population_index, size_t src_neuron_index, size_t src_evtport_index, size_t src_event_index)
+: src_population_index(src_population_index),
+    src_neuron_index(src_neuron_index),
+    src_evtport_index(src_evtport_index),
+    src_event_index(src_event_index)
 {
 
 }

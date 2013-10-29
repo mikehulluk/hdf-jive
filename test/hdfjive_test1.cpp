@@ -44,7 +44,7 @@ int main()
     HDFManager::getInstance().get_file("myfile.hdf")->get_group("/SimulationResults/P1/P2");
 
     HDF5GroupPtr pGroup = HDFManager::getInstance().get_file("myfile.hdf")->get_group("/SimulationResults/P1/P2/");
-    pGroup->create_empty_dataset2D("d1", HDF5DataSet2DStdSettings(4, H5T_NATIVE_FLOAT ));
+    pGroup->create_empty_dataset2D("d1", HDF5DataSet2DStdSettings(H5T_NATIVE_FLOAT, 4));
     HDF5DataSet2DStdPtr ds = pGroup->get_dataset2D("d1");
 
     float data[] = {2.4, .3,4, 4.6, 9.6} ;
@@ -58,7 +58,7 @@ int main()
 
     HDFManager::getInstance().get_file("myfile.hdf")->get_dataset2D("/SimulationResults/P1/P2/d1")->append_buffer( FB( list_of(1.1f)(2.2f)(3.3f)(4.4f).to_adapter() ) );
 
-    pGroup->create_empty_dataset2D("d2", HDF5DataSet2DStdSettings(1, H5T_NATIVE_INT) );
+    pGroup->create_empty_dataset2D("d2", HDF5DataSet2DStdSettings(H5T_NATIVE_INT,1) );
     pGroup->get_dataset2D("d2")->append_single(30);
     pGroup->get_dataset2D("d2")->append_single(40);
     pGroup->get_dataset2D("d2")->append_single(50);
