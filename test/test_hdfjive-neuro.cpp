@@ -10,6 +10,11 @@ using std::vector;
 using std::array;
 using boost::assign::list_of;
 
+#include "boost/tuple/tuple.hpp"
+
+
+
+
 
 void test_pointers()
 {
@@ -84,12 +89,67 @@ void test_output_events_1()
 
 
 
+struct MyEventType0
+{
+    float time;
+    MyEventType0(float time) : time(time) {}
+};
+
+struct MyEventType1
+{
+    int TIME;
+    int P0;
+    MyEventType1(int TIME, int P0): TIME(TIME), P0(P0) {}
+};
+
+struct MyEventType2
+{
+    double my_time;
+    double P0;
+    double P1;
+
+    MyEventType2( double my_time, double P0, double P1 )
+        :  my_time(my_time),  P0(P0),  P1(P1)
+    {}
+};
+
+struct MyEventExtractor0
+{
+    typedef MyEventType0 EVENTTYPE;
+    typedef double DTYPE;
+    static const int NPARAMS = 0;
+    static float get_time(const EVENTTYPE& o) { return o.time; }
+    static float get_parameter_value(const EVENTTYPE& o, int i) {  assert(0);  }
+    static string get_parameter_name( int i) { assert(0); }
+};
+
+
+struct MyEventExtractor1
+{
+    typedef MyEventType1 EVENTTYPE;
+    typedef double DTYPE;
+    static const int NPARAMS = 1;
+    static float get_time(const EVENTTYPE& o) { return o.TIME; }
+    static float get_parameter_value(const EVENTTYPE& o, int i) { switch(i){ case 0: return o.P0;  default: assert(0); } }
+    static string get_parameter_name( int i) { switch(i){ case 0: return "P0";   default: assert(0); } }
+};
+
+
+
+struct MyEventExtractor2
+{
+    typedef MyEventType2 EVENTTYPE;
+    typedef double DTYPE;
+    static const int NPARAMS = 2;
+    static float get_time(const EVENTTYPE& o) { return o.my_time; }
+    static float get_parameter_value(const EVENTTYPE& o, int i) { switch(i){ case 0: return o.P0; case 1: return o.P1; default: assert(0); } }
+    static string get_parameter_name( int i) { switch(i){ case 0: return "P0"; case 1: return "P1";    default: assert(0); } }
+};
+
+
 // Method: 2 - Creating 'Event' objects:
 void test_output_events_2()
 {
-    typedef EventType<float, 0> MyEventType0;
-    typedef EventType<double,1> MyEventType1;
-    typedef EventType<float, 2> MyEventType2;
 
     vector<MyEventType0> evts_0_vec;
     list<MyEventType0> evts_0_list;
@@ -99,19 +159,19 @@ void test_output_events_2()
     list<MyEventType2> evts_2_list;
 
     // Create some events (0-param):
-    MyEventType0 evt0_a(-1, 0.2);
-    MyEventType0 evt0_b(-1, 0.3);
-    MyEventType0 evt0_c(-1, 0.7);
+    MyEventType0 evt0_a(0.2f);
+    MyEventType0 evt0_b(0.3f);
+    MyEventType0 evt0_c(0.7f);
 
     // Create some events (1-param):
-    MyEventType1 evt1_a(-1, 0.2, 45);
-    MyEventType1 evt1_b(-1, 0.3, 46);
-    MyEventType1 evt1_c(-1, 0.7, 47);
+    MyEventType1 evt1_a(2, 45);
+    MyEventType1 evt1_b(3, 46);
+    MyEventType1 evt1_c(7, 47);
 
     // Create some events (2-param):
-    MyEventType2 evt2_a(-1, 0.2, 45, 56);
-    MyEventType2 evt2_b(-1, 0.3, 46, 23);
-    MyEventType2 evt2_c(-1, 0.7, 47, 90);
+    MyEventType2 evt2_a(0.2, 45., 56.);
+    MyEventType2 evt2_b(0.3, 46., 23.);
+    MyEventType2 evt2_c(0.7, 47., 90.);
 
 
     // Save the events
@@ -125,12 +185,12 @@ void test_output_events_2()
 
     SimulationResultsPtr output = SimulationResultsFile("MyResults4.hdf").Simulation("Sim1");
 
-    output->write_outputevents_byobjects("population-dINs-RHS", 0, "evts_0_vec", evts_0_vec.begin(), evts_0_vec.end() );
-    output->write_outputevents_byobjects("population-dINs-RHS", 0, "evts_0_list", evts_0_list.begin(), evts_0_list.end() );
-    output->write_outputevents_byobjects("population-dINs-RHS", 0, "evts_1_vec", evts_1_vec.begin(), evts_1_vec.end() );
-    output->write_outputevents_byobjects("population-dINs-RHS", 0, "evts_1_list", evts_1_list.begin(), evts_1_list.end() );
-    output->write_outputevents_byobjects("population-dINs-RHS", 0, "evts_2_vec", evts_2_vec.begin(), evts_2_vec.end() );
-    output->write_outputevents_byobjects("population-dINs-RHS", 0, "evts_2_list", evts_2_list.begin(), evts_2_list.end() );
+    output->write_outputevents_byobjects_extractor<MyEventExtractor0>("population-dINs-RHS", 0, "evts_0_vec", evts_0_vec.begin(), evts_0_vec.end() );
+    output->write_outputevents_byobjects_extractor<MyEventExtractor0>("population-dINs-RHS", 0, "evts_0_list", evts_0_list.begin(), evts_0_list.end() );
+    output->write_outputevents_byobjects_extractor<MyEventExtractor1>("population-dINs-RHS", 0, "evts_1_vec", evts_1_vec.begin(), evts_1_vec.end() );
+    output->write_outputevents_byobjects_extractor<MyEventExtractor1>("population-dINs-RHS", 0, "evts_1_list", evts_1_list.begin(), evts_1_list.end() );
+    output->write_outputevents_byobjects_extractor<MyEventExtractor2>("population-dINs-RHS", 0, "evts_2_vec", evts_2_vec.begin(), evts_2_vec.end() );
+    output->write_outputevents_byobjects_extractor<MyEventExtractor2>("population-dINs-RHS", 0, "evts_2_list", evts_2_list.begin(), evts_2_list.end() );
 }
 
 // Method: 3 - Passing pointers to arrays of data (TODO)
@@ -178,14 +238,133 @@ void test_input_events_2()
     //void write_inputeventsNEW2(const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() );
 }
 
+
+
+
+struct MyInputEventType0
+{
+    float time;
+
+    size_t src_population_index;
+    size_t src_neuron_index;
+    size_t src_evtport_index;
+    size_t src_event_index;
+
+    MyInputEventType0(size_t src_population_index, size_t src_neuron_index, size_t src_evtport_index, size_t src_event_index, float time)
+    : time(time), src_population_index(src_population_index),  src_neuron_index(src_neuron_index),  src_evtport_index(src_evtport_index),  src_event_index(src_event_index)
+    {}
+};
+
+
+struct MyInputEventType2
+{
+    double my_time;
+    double P0;
+    double P1;
+
+    size_t src_population_index;
+    size_t src_neuron_index;
+    size_t src_evtport_index;
+    size_t src_event_index;
+
+    MyInputEventType2(size_t src_population_index, size_t src_neuron_index, size_t src_evtport_index, size_t src_event_index, double my_time, double P0, double P1 )
+        :  my_time(my_time),  P0(P0),  P1(P1) , src_population_index(src_population_index),  src_neuron_index(src_neuron_index),  src_evtport_index(src_evtport_index),  src_event_index(src_event_index)
+
+    {}
+};
+
+struct MyInputEventExtractor0
+{
+    typedef MyInputEventType0 EVENTTYPE;
+    typedef double DTYPE;
+    static const int NPARAMS = 0;
+    static DTYPE get_time(const EVENTTYPE& o) { return o.time; }
+    static DTYPE get_parameter_value(const EVENTTYPE& o, int i) {  assert(0);  }
+    static string get_parameter_name( int i) { assert(0); }
+
+    static const size_t NSRCINDICES = 4;
+    static DTYPE get_srcindex_value(const EVENTTYPE& o, size_t i)
+    {
+        switch(i){
+            case 0: return o.src_population_index;
+            case 1: return o.src_neuron_index;
+            case 2: return o.src_evtport_index;
+            case 3: return o.src_event_index;
+            default: assert(0);
+        }
+    }
+    static string get_index_name( size_t i)
+    {
+        switch(i){
+            case 0: return "PopIndex";
+            case 1: return "NrnIndex";
+            case 2: return "EvtPortIndex";
+            case 3: return "EvtIndex";
+            default: assert(0);
+        }
+
+    }
+
+};
+
+
+
+
+
+struct MyInputEventExtractor2
+{
+    typedef MyInputEventType2 EVENTTYPE;
+    typedef double DTYPE;
+    static const int NPARAMS = 2;
+    static DTYPE get_time(const EVENTTYPE& o) { return o.my_time; }
+    static DTYPE get_parameter_value(const EVENTTYPE& o, int i) { switch(i){ case 0: return o.P0; case 1: return o.P1; default: assert(0); } }
+    static string get_parameter_name( int i) { switch(i){ case 0: return "P0"; case 1: return "P1";    default: assert(0); } }
+
+
+    static const size_t NSRCINDICES = 4;
+    static DTYPE get_srcindex_value(const EVENTTYPE& o, size_t i)
+    {
+        switch(i){
+            case 0: return o.src_population_index;
+            case 1: return o.src_neuron_index;
+            case 2: return o.src_evtport_index;
+            case 3: return o.src_event_index;
+            default: assert(0);
+        }
+    }
+    static string get_index_name(size_t i)
+    {
+        switch(i){
+            case 0: return "PopIndex";
+            case 1: return "NrnIndex";
+            case 2: return "EvtPortIndex";
+            case 3: return "EvtIndex";
+            default: assert(0);
+        }
+    }
+
+
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void test_input_events_3()
 {
     /* Create some output-events: */
     // ==============================
-    typedef EventType<float, 0> MyEventType0;
-    typedef EventType<double,1> MyEventType1;
-    typedef EventType<float, 2> MyEventType2;
-
+    //
     vector<MyEventType0> evts_0_vec;
     list<MyEventType0> evts_0_list;
     vector<MyEventType1> evts_1_vec;
@@ -194,19 +373,19 @@ void test_input_events_3()
     list<MyEventType2> evts_2_list;
 
     // Create some events (0-param):
-    MyEventType0 evt0_a(-1, 0.2);
-    MyEventType0 evt0_b(-1, 0.3);
-    MyEventType0 evt0_c(-1, 0.7);
+    MyEventType0 evt0_a(0.2f);
+    MyEventType0 evt0_b(0.3f);
+    MyEventType0 evt0_c(0.7f);
 
     // Create some events (1-param):
-    MyEventType1 evt1_a(-1, 0.2, 45);
-    MyEventType1 evt1_b(-1, 0.3, 46);
-    MyEventType1 evt1_c(-1, 0.7, 47);
+    MyEventType1 evt1_a(2, 45);
+    MyEventType1 evt1_b(3, 46);
+    MyEventType1 evt1_c(7, 47);
 
     // Create some events (2-param):
-    MyEventType2 evt2_a(-1, 0.2, 45, 56);
-    MyEventType2 evt2_b(-1, 0.3, 46, 23);
-    MyEventType2 evt2_c(-1, 0.7, 47, 90);
+    MyEventType2 evt2_a(0.2, 45., 56.);
+    MyEventType2 evt2_b(0.3, 46., 23.);
+    MyEventType2 evt2_c(0.7, 47., 90.);
 
 
     // Save the events
@@ -218,37 +397,34 @@ void test_input_events_3()
     evts_2_list.push_back(evt2_a); evts_2_list.push_back(evt2_b); evts_2_list.push_back(evt2_c);
 
 
-    SimulationResultsPtr output = SimulationResultsFile("MyResults6.hdf").Simulation("Sim1");
+    SimulationResultsPtr output = SimulationResultsFile("MyResults8.hdf").Simulation("Sim1");
 
-    output->write_outputevents_byobjects("population-dINs-RHS", 0, "out_evts_0_vec", evts_0_vec.begin(), evts_0_vec.end() );
-    output->write_outputevents_byobjects("population-dINs-RHS", 0, "out_evts_0_list", evts_0_list.begin(), evts_0_list.end() );
-    output->write_outputevents_byobjects("population-dINs-RHS", 0, "out_evts_1_vec", evts_1_vec.begin(), evts_1_vec.end() );
-    output->write_outputevents_byobjects("population-dINs-RHS", 0, "out_evts_1_list", evts_1_list.begin(), evts_1_list.end() );
-    output->write_outputevents_byobjects("population-dINs-RHS", 0, "out_evts_2_vec", evts_2_vec.begin(), evts_2_vec.end() );
-    output->write_outputevents_byobjects("population-dINs-RHS", 0, "out_evts_2_list", evts_2_list.begin(), evts_2_list.end() );
+    output->write_outputevents_byobjects_extractor<MyEventExtractor0>("population-dINs-RHS", 0, "evts_0_vec", evts_0_vec.begin(), evts_0_vec.end() );
+    output->write_outputevents_byobjects_extractor<MyEventExtractor0>("population-dINs-RHS", 0, "evts_0_list", evts_0_list.begin(), evts_0_list.end() );
+    output->write_outputevents_byobjects_extractor<MyEventExtractor1>("population-dINs-RHS", 0, "evts_1_vec", evts_1_vec.begin(), evts_1_vec.end() );
+    output->write_outputevents_byobjects_extractor<MyEventExtractor1>("population-dINs-RHS", 0, "evts_1_list", evts_1_list.begin(), evts_1_list.end() );
+    output->write_outputevents_byobjects_extractor<MyEventExtractor2>("population-dINs-RHS", 0, "evts_2_vec", evts_2_vec.begin(), evts_2_vec.end() );
+    output->write_outputevents_byobjects_extractor<MyEventExtractor2>("population-dINs-RHS", 0, "evts_2_list", evts_2_list.begin(), evts_2_list.end() );
 
 
 
 
     // Save the events:
-    typedef InputEventType<MyEventType0> InEventFloat0;
-    typedef InputEventType<MyEventType2> InEventFloat2;
-    vector<InEventFloat0> in_evts_float0_vec;
-    vector<InEventFloat2> in_evts_float2_vec;
+    vector<MyInputEventType0> in_evts_float0_vec;
+    vector<MyInputEventType2> in_evts_float2_vec;
 
     // Input events (0-param):
-    in_evts_float0_vec.push_back(InEventFloat0(SrcEventReference(0,0,0,0), MyEventType0(0, 1.0)));
-    in_evts_float0_vec.push_back(InEventFloat0(SrcEventReference(0,0,0,1), MyEventType0(1, 3.0)));
-    in_evts_float0_vec.push_back(InEventFloat0(SrcEventReference(0,0,0,2), MyEventType0(2, 8.0)));
+    in_evts_float0_vec.push_back(MyInputEventType0(0,0,0,0, 0));
+    in_evts_float0_vec.push_back(MyInputEventType0(0,0,0,1, 1));
+    in_evts_float0_vec.push_back(MyInputEventType0(0,0,0,2, 2));
 
     // Input events (2-param):
-    in_evts_float2_vec.push_back(InEventFloat2(SrcEventReference(1,0,0,0), MyEventType2(0, 1.0, 2.3, 5.6 ) )  );
-    in_evts_float2_vec.push_back(InEventFloat2(SrcEventReference(1,0,0,1), MyEventType2(1, 3.0, 4.3, 5.6 ) )  );
-    in_evts_float2_vec.push_back(InEventFloat2(SrcEventReference(1,0,0,2), MyEventType2(2, 8.0, 7.3, 6.6 ) )  );
+    in_evts_float2_vec.push_back(MyInputEventType2(1,0,0,0, 0, 1.0, 2.3 ) );
+    in_evts_float2_vec.push_back(MyInputEventType2(1,0,0,1, 1, 3.0, 4.3 ) );
+    in_evts_float2_vec.push_back(MyInputEventType2(1,0,0,2, 2, 8.0, 7.3 ) );
 
-    output->write_inputevents_byobjects("population-dINs-RHS", 0, "in_evts_0_list", in_evts_float0_vec.begin(), in_evts_float0_vec.end() );
-    output->write_inputevents_byobjects("population-dINs-RHS", 0, "in_evts_2_list", in_evts_float2_vec.begin(), in_evts_float2_vec.end() );
-
+    output->write_inputevents_byobjects_extractor<MyInputEventExtractor0>("population-dINs-RHS", 0, "in_evts_0_list", in_evts_float0_vec.begin(), in_evts_float0_vec.end() );
+    output->write_inputevents_byobjects_extractor<MyInputEventExtractor2>("population-dINs-RHS", 0, "in_evts_2_list", in_evts_float2_vec.begin(), in_evts_float2_vec.end() );
 
 }
 
@@ -269,14 +445,14 @@ struct MyEvent
 
 
 
-struct MyEventExtractor 
+struct MyEventExtractor
 {
     typedef MyEvent EVENTTYPE;
     typedef double DTYPE;
     static const int NPARAMS = 2;
 
-    static float get_time(const EVENTTYPE& o) { return o.time; }
-    static float get_parameter_value(const EVENTTYPE& o, int i) { switch(i){ case 0: return o.param1; case 1: return o.param2; default: assert(0); } }
+    static DTYPE get_time(const EVENTTYPE& o) { return o.time; }
+    static DTYPE get_parameter_value(const EVENTTYPE& o, int i) { switch(i){ case 0: return o.param1; case 1: return o.param2; default: assert(0); } }
     static string get_parameter_name( int i) { switch(i){ case 0: return "param1"; case 1: return "asd";    default: assert(0); } }
 };
 
@@ -308,7 +484,7 @@ void test_input_events_4()
     evts.push_back(o);
 
     SimulationResultsPtr output = SimulationResultsFile("MyResults6.hdf").Simulation("Sim1");
-    output->write_outputevents_byobjects_extractor<MyEventExtractor>( ",,",0,"ll", evts.begin(), evts.end() ); 
+    output->write_outputevents_byobjects_extractor<MyEventExtractor>( ",,",0,"ll", evts.begin(), evts.end() );
 
 
 

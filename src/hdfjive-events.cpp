@@ -3,7 +3,7 @@
 #include "hdfjive-events.h"
 #include <assert.h>
 
-
+/*
 template<typename DATATYPE, int NPARAMS>
 EventType<DATATYPE,NPARAMS>::EventType(size_t event_index, DATATYPE time)
     : event_index(event_index), time(time)
@@ -119,5 +119,5 @@ template InputEventType< EventType<double,1> >::InputEventType(const SrcEventRef
 template InputEventType< EventType<double,2> >::InputEventType(const SrcEventReference&, const EventType<double,2>& );
 template InputEventType< EventType<double,3> >::InputEventType(const SrcEventReference&, const EventType<double,3>& );
 template InputEventType< EventType<double,4> >::InputEventType(const SrcEventReference&, const EventType<double,4>& );
-
+*/
 
