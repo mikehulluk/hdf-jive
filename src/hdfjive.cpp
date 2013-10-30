@@ -57,27 +57,9 @@ class _HDF5Location
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 HDF5DataSet2DStd::HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet2DStdSettings& settings)
     :length(0), name(name), pParent(pParent), settings(settings)
 {
-
     hsize_t data_dims[2] = {0, settings.size};
     hsize_t data_max_dims[2] = {H5S_UNLIMITED, settings.size} ;
     dataspace_id = H5Screate_simple(2, data_dims, data_max_dims);
@@ -104,17 +86,6 @@ std::string HDF5DataSet2DStd::get_fullname() const
 {
     return pParent.lock()->get_fullname() + "/" + name;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -146,11 +117,6 @@ size_t HDF5DataSet2DStd::get_length() const
 
 
 
-
-size_t HDF5DataSet1DStd::get_length() const
-{
-    return length;
-}
 
 HDF5DataSet1DStd::HDF5DataSet1DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet1DStdSettings& settings)
     : length(0), name(name), pParent(pParent), settings(settings)
@@ -185,110 +151,9 @@ std::string HDF5DataSet1DStd::get_fullname() const
 
 
 
-template<typename T>
-size_t _append_to_array_1D(hid_t datatype, T data, hid_t dataset_id)
+size_t HDF5DataSet1DStd::get_length() const
 {
-    // How big is the array:?
-    hsize_t dims[1], max_dims[1];
-    hid_t dataspace = H5Dget_space(dataset_id);
-    H5Sget_simple_extent_dims(dataspace, dims, max_dims);
-    H5Sclose(dataspace);
-
-    hsize_t curr_size = dims[0];
-
-    // Extend the table:
-    hsize_t new_data_dims[1] = {curr_size+1};
-    H5Dextend (dataset_id, new_data_dims);
-
-    // And copy:
-    hid_t filespace = H5Dget_space(dataset_id);
-    hsize_t offset[1] = {curr_size};
-    hsize_t count[1] = {1};
-    H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
-    hsize_t dim1[1] = {1};
-    hid_t memspace = H5Screate_simple(1, dim1, NULL);
-    H5Dwrite (dataset_id, datatype, memspace, filespace, H5P_DEFAULT, &data);
-
-    H5Sclose(memspace);
-    H5Sclose(filespace);
-
-    return new_data_dims[0];
-}
-
-
-
-void HDF5DataSet1DStd::append( float data )
-{
-    assert(settings.type==H5T_NATIVE_FLOAT);
-    length = _append_to_array_1D<float>(H5T_NATIVE_FLOAT, data, dataset_id);
-}
-
-
-void HDF5DataSet1DStd::append( double data )
-{
-    assert(settings.type==H5T_NATIVE_DOUBLE);
-    length = _append_to_array_1D<double>(H5T_NATIVE_DOUBLE, data, dataset_id);
-}
-
-void HDF5DataSet1DStd::append( int data )
-{
-    assert(settings.type==H5T_NATIVE_INT);
-    length = _append_to_array_1D<int>(H5T_NATIVE_INT, data, dataset_id);
-}
-
-void HDF5DataSet1DStd::append( long data )
-{
-    assert(settings.type==H5T_NATIVE_LONG);
-    length = _append_to_array_1D<long>(H5T_NATIVE_LONG, data, dataset_id);
-}
-
-
-
-
-
-template<typename T>
-size_t _write_to_array_1D(hid_t datatype, const T* pData, size_t N, hid_t dataset_id)
-{
-    // Extend the table:
-    hsize_t new_data_dims[1] = {N}; 
-    H5Dextend (dataset_id, new_data_dims);
-    // And copy:
-    hid_t filespace = H5Dget_space(dataset_id);
-    hsize_t offset[1] = {0};
-    hsize_t count[1] = {N};
-    H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
-    hsize_t dim1[1] = {N};
-    hid_t memspace = H5Screate_simple(1, dim1, NULL);
-    H5Dwrite (dataset_id, datatype, memspace, filespace, H5P_DEFAULT, pData);
-
-    H5Sclose(memspace);
-    H5Sclose(filespace);
-
-    return N;
-}
-
-
-void HDF5DataSet1DStd::set_data(size_t n, const float* pData)
-{
-    assert(settings.type==H5T_NATIVE_FLOAT);
-    length = _write_to_array_1D<float>(H5T_NATIVE_FLOAT, pData, n, dataset_id);
-}
-
-
-void HDF5DataSet1DStd::set_data(size_t n, const double* pData)
-{
-    assert(settings.type==H5T_NATIVE_DOUBLE);
-    length = _write_to_array_1D<double>(H5T_NATIVE_DOUBLE, pData, n, dataset_id);
-}
-void HDF5DataSet1DStd::set_data(size_t n, const int* pData)
-{
-     assert(settings.type==H5T_NATIVE_INT);
-    length = _write_to_array_1D<int>(H5T_NATIVE_INT, pData, n, dataset_id);
-}
-void HDF5DataSet1DStd::set_data(size_t n, const long* pData)
-{
-    assert(settings.type==H5T_NATIVE_LONG);
-    length = _write_to_array_1D<long>(H5T_NATIVE_LONG, pData, n, dataset_id);
+    return length;
 }
 
 
