@@ -8,10 +8,28 @@ import os
 
 
 class SimulationResultTraces(object):
-    def __init__(self, time_pts, data_pts):
-        self.time_pts = time_pts
-        self.data_pts = data_pts
+    def __init__(self, node):
 
+        self.node = node
+
+        self._time_pts=None
+        self._data_pts=None
+
+    @property
+    def time_pts(self):
+        if self._time_pts is None:
+            sf = self.node.time._v_attrs.__dict__["hdfjive:scaling"] if "hdfjive:scaling" in self.node.time._v_attrs.__dict__ else 1.0
+            self._time_pts  = self.node.time().read()
+        return self._time_pts
+        
+    @property
+    def data_pts(self):
+        if self._data_pts is None:
+            sf = self.node.data._v_attrs.__dict__["hdfjive:scaling"] if "hdfjive:scaling" in self.node.data._v_attrs.__dict__ else 1.0
+            self._data_pts  = self.node.data.read() * sf
+        return self._data_pts
+
+            
 
 
 
@@ -34,11 +52,11 @@ class SimulationResultTraceProxy(object):
         self.group = group
         self.tags = group._v_attrs['hdf-jive:tags'].split(",")
 
+        
+
         # Check everything is OK:
-        self.raw_data = SimulationResultTraces(
-                    time_pts=group.raw.time().read(),
-                    data_pts=group.raw.data.read(),
-                    )
+        self.raw_data = SimulationResultTraces(node=group.raw)
+
 
 
 

@@ -37,7 +37,7 @@ def _run_plot(args):
     print args
     print
 
-    hdffiles = hdfjive.HDF5SimulationResultFileSet([args.filename] + args.additional_filename)
+    hdffiles = hdfjive.HDF5SimulationResultFileSet([args.filename] + (args.additional_filename if args.additional_filename else []))
 
 
     # Controlling x-limits:
