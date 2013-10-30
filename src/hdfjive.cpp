@@ -191,24 +191,6 @@ size_t HDF5DataSet1DStd::get_length() const
 void HDF5Group::add_attribute(const string& name, const string& value_in)
 {
     return hdfjive::util::add_attribute(group_id, name, value_in);
-
-    /*
-    std::string value = value_in;
-    if( value.size() == 0)
-    {
-        value = " ";
-    }
-    
-    hid_t datatype_id = H5Tcopy (H5T_C_S1);
-    H5Tset_size (datatype_id, value.size());
-
-    hid_t space=H5Screate (H5S_SCALAR);
-    hid_t attr_id = H5Acreate2(group_id, name.c_str(), datatype_id, space, H5P_DEFAULT, H5P_DEFAULT);
-    
-    const char* attrs_data = value.c_str(); 
-    H5Awrite(attr_id, datatype_id, attrs_data);
-    * */
-    
 }
 
 
@@ -368,23 +350,6 @@ HDF5DataSet1DStdPtr HDF5Group::get_dataset1D(const string& name)
 
 
 
-
-// Convienance methods:
-/*
-HDF5DataSet1DStdPtr HDF5Group::create_dataset1D(const string& name, const FloatBuffer1D& data)
-{
-    HDF5DataSet1DStdPtr pDataSet = create_empty_dataset1D(name, HDF5DataSet1DStdSettings(H5T_NATIVE_FLOAT) );
-    pDataSet->set_data(data);
-    return pDataSet;
-}
-
-HDF5DataSet1DStdPtr HDF5Group::create_dataset1D(const string& name, const IntBuffer1D& data)
-{
-    HDF5DataSet1DStdPtr pDataSet = create_empty_dataset1D(name, HDF5DataSet1DStdSettings(H5T_NATIVE_INT) );
-    pDataSet->set_data(data);
-    return pDataSet;
-}
-*/
 
 
 

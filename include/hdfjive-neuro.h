@@ -119,10 +119,8 @@ public:
     SharedTimeBufferPtr write_shared_time_buffer(FwdIt it, FwdIt end)
     {
         typedef typename std::iterator_traits<FwdIt>::value_type T;
-
         // Copy the data into a vector, so that its contiguous:
         vector<T> data(it, end);
-
         return write_shared_time_buffer<T>(data.size(), &(data[0]));
     }
 
@@ -134,7 +132,7 @@ public:
      * Record a trace to the hdfjive file, using a pointer to the raw data. The length of the array should be the same as the time-buffer.
      */
     template<typename TIMEDATATYPE>
-    void write_trace(const std::string& populationname, size_t index, const std::string& record_name, SharedTimeBufferPtr times, TIMEDATATYPE* pData, const TagList& tags_in=TagList())
+    HDF5DataSet2DStdPtr write_trace(const std::string& populationname, size_t index, const std::string& record_name, SharedTimeBufferPtr times, TIMEDATATYPE* pData, const TagList& tags_in=TagList())
     {
         HDF5GroupPtr pNodeGroup = pSimulationGroup
             ->get_group(populationname)
@@ -161,6 +159,8 @@ public:
         // Create the data:
         HDF5DataSet2DStdPtr pDataSet = pDataGroup->create_empty_dataset2D("data", HDF5DataSet2DStdSettings(CPPTypeToHDFType<TIMEDATATYPE>::get_hdf_type(), 1));
         pDataSet->set_data( times->get_size(), 1, pData);
+
+        return pDataSet;
     }
 
 
@@ -169,7 +169,7 @@ public:
      * Record a trace to the hdfjive file from an STL container. The length of the container should be the same as the time-buffer.
      */
     template<typename FwdIt>
-    void write_trace(const std::string& populationname, size_t index, const std::string& record_name, SharedTimeBufferPtr times, FwdIt it, FwdIt end, const TagList& tags=TagList())
+    HDF5DataSet2DStdPtr write_trace(const std::string& populationname, size_t index, const std::string& record_name, SharedTimeBufferPtr times, FwdIt it, FwdIt end, const TagList& tags=TagList())
     {
         typedef typename std::iterator_traits<FwdIt>::value_type T;
 
@@ -177,7 +177,7 @@ public:
         vector<T> data(it, end);
         assert(data.size() == times->get_size());
 
-        write_trace<T>(populationname, index, record_name, times,  &data[0], tags);
+        return write_trace<T>(populationname, index, record_name, times,  &data[0], tags);
     }
 
 
@@ -191,7 +191,8 @@ public:
 
      // A. With no parameters:
      // i. Simple, a pointer to an array of spike-times:
-    template<typename DATATYPE> void write_outputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, size_t n_events, DATATYPE* times, const TagList& tags=TagList() )
+    template<typename DATATYPE>
+    void write_outputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, size_t n_events, DATATYPE* times, const TagList& tags=TagList() )
     {
         HDF5GroupPtr pGroup = pSimulationGroup
         ->get_group(populationname)
