@@ -19,7 +19,7 @@ class SimulationResultTraces(object):
     def time_pts(self):
         if self._time_pts is None:
             sf = self.node.time._v_attrs.__dict__["hdfjive:scaling"] if "hdfjive:scaling" in self.node.time._v_attrs.__dict__ else 1.0
-            self._time_pts  = self.node.time().read()
+            self._time_pts  = self.node.time().read() * sf
         return self._time_pts
         
     @property
@@ -51,8 +51,6 @@ class SimulationResultTraceProxy(object):
     def __init__(self, group):
         self.group = group
         self.tags = group._v_attrs['hdf-jive:tags'].split(",")
-
-        
 
         # Check everything is OK:
         self.raw_data = SimulationResultTraces(node=group.raw)
