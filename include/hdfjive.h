@@ -374,30 +374,30 @@ size_t _append_to_array_1D(hid_t datatype, T data, hid_t dataset_id)
 
 
 
-
-
-template<typename T>
-size_t _write_to_array_1D(hid_t datatype, const T* pData, size_t N, hid_t dataset_id)
-{
-    // Extend the table:
-    hsize_t new_data_dims[1] = {N}; 
-    H5Dextend (dataset_id, new_data_dims);
-    // And copy:
-    hid_t filespace = H5Dget_space(dataset_id);
-    hsize_t offset[1] = {0};
-    hsize_t count[1] = {N};
-    H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
-    hsize_t dim1[1] = {N};
-    hid_t memspace = H5Screate_simple(1, dim1, NULL);
-    H5Dwrite (dataset_id, datatype, memspace, filespace, H5P_DEFAULT, pData);
-
-    H5Sclose(memspace);
-    H5Sclose(filespace);
-
-    return N;
-}
-
-
+//~ 
+//~ 
+//~ template<typename T>
+//~ size_t _write_to_array_1D(hid_t datatype, const T* pData, size_t N, hid_t dataset_id)
+//~ {
+    //~ // Extend the table:
+    //~ hsize_t new_data_dims[1] = {N}; 
+    //~ H5Dextend (dataset_id, new_data_dims);
+    //~ // And copy:
+    //~ hid_t filespace = H5Dget_space(dataset_id);
+    //~ hsize_t offset[1] = {0};
+    //~ hsize_t count[1] = {N};
+    //~ H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
+    //~ hsize_t dim1[1] = {N};
+    //~ hid_t memspace = H5Screate_simple(1, dim1, NULL);
+    //~ H5Dwrite (dataset_id, datatype, memspace, filespace, H5P_DEFAULT, pData);
+//~ 
+    //~ H5Sclose(memspace);
+    //~ H5Sclose(filespace);
+//~ 
+    //~ return N;
+//~ }
+//~ 
+//~ 
 
 
 
@@ -432,51 +432,40 @@ public:
 
     template<typename T>
     inline
-    void set_data(size_t n, const T* pData)
+    void set_data(size_t N, const T* pData)
     {
+        // Is the datatype consistent?
         hid_t hdf5type = CPPTypeToHDFType<T>::get_hdf_type();
         assert(settings.type==hdf5type);
-        length = _write_to_array_1D<T>(hdf5type, pData, n, dataset_id);
+
+        // Extend the table:
+        hsize_t new_data_dims[1] = {N}; 
+        H5Dextend (dataset_id, new_data_dims);
+        
+        // And copy:
+        hid_t filespace = H5Dget_space(dataset_id);
+        hsize_t offset[1] = {0};
+        hsize_t count[1] = {N};
+        H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
+        hsize_t dim1[1] = {N};
+        hid_t memspace = H5Screate_simple(1, dim1, NULL);
+        H5Dwrite (dataset_id, hdf5type, memspace, filespace, H5P_DEFAULT, pData);
+
+        // Clean up the handles:
+        H5Sclose(memspace);
+        H5Sclose(filespace);
+
+        // Store the length:
+        length = N;
+
     }
 
-    /*
-    inline
-    void set_data(size_t n, const float* pData)
-    {
-        assert(settings.type==H5T_NATIVE_FLOAT);
-        length = _write_to_array_1D<float>(H5T_NATIVE_FLOAT, pData, n, dataset_id);
-    }
-
-    inline
-    void set_data(size_t n, const double* pData)
-    {
-        assert(settings.type==H5T_NATIVE_DOUBLE);
-        length = _write_to_array_1D<double>(H5T_NATIVE_DOUBLE, pData, n, dataset_id);
-    }
-
-    inline
-    void set_data(size_t n, const int* pData)
-    {
-         assert(settings.type==H5T_NATIVE_INT);
-        length = _write_to_array_1D<int>(H5T_NATIVE_INT, pData, n, dataset_id);
-    }
-
-    inline
-    void set_data(size_t n, const long* pData)
-    {
-        assert(settings.type==H5T_NATIVE_LONG);
-        length = _write_to_array_1D<long>(H5T_NATIVE_LONG, pData, n, dataset_id);
-    }
-    */
-
-
-
-
-    template<typename T>
-    void set_data( const DataBuffer1D<T>& buff)
-    {
-        set_data(buff.size(), buff.get_data_pointer() );
-    }
+    
+    //~ template<typename T>
+    //~ void set_data( const DataBuffer1D<T>& buff)
+    //~ {
+        //~ set_data(buff.size(), buff.get_data_pointer() );
+    //~ }
 
     std::string get_fullname() const;
     size_t get_length() const;
