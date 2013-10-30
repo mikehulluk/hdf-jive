@@ -397,7 +397,7 @@ void test_input_events_3()
     evts_2_list.push_back(evt2_a); evts_2_list.push_back(evt2_b); evts_2_list.push_back(evt2_c);
 
 
-    SimulationResultsPtr output = SimulationResultsFile("MyResults8.hdf").Simulation("Sim1");
+    SimulationResultsPtr output = SimulationResultsFile("MyResults6.hdf").Simulation("Sim1");
 
     output->write_outputevents_byobjects_extractor<MyEventExtractor0>("population-dINs-RHS", 0, "evts_0_vec", evts_0_vec.begin(), evts_0_vec.end() );
     output->write_outputevents_byobjects_extractor<MyEventExtractor0>("population-dINs-RHS", 0, "evts_0_list", evts_0_list.begin(), evts_0_list.end() );
