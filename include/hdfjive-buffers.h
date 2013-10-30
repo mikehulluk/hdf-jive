@@ -3,6 +3,8 @@
 #ifndef __HDFJIVE_BUFFERS_GUARD_H__
 #define __HDFJIVE_BUFFERS_GUARD_H__
 
+
+/*
 template<typename T>
 class DataBuffer1D
 {
@@ -36,7 +38,7 @@ typedef DataBuffer1D<int> IntBuffer1D;
 // Synaptic sugar:2
 typedef FloatBuffer1D FB;
 typedef IntBuffer1D IB;
-
+*/
 
 
 

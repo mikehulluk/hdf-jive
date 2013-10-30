@@ -362,6 +362,7 @@ HDF5DataSet1DStdPtr HDF5Group::get_dataset1D(const string& name)
 
 
 // Convienance methods:
+/*
 HDF5DataSet1DStdPtr HDF5Group::create_dataset1D(const string& name, const FloatBuffer1D& data)
 {
     HDF5DataSet1DStdPtr pDataSet = create_empty_dataset1D(name, HDF5DataSet1DStdSettings(H5T_NATIVE_FLOAT) );
@@ -375,7 +376,7 @@ HDF5DataSet1DStdPtr HDF5Group::create_dataset1D(const string& name, const IntBuf
     pDataSet->set_data(data);
     return pDataSet;
 }
-
+*/
 
 
 

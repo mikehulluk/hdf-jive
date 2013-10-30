@@ -231,6 +231,7 @@ public:
 
     // Convience methods:
     // ///////////////////////////
+    /*
     template<typename TYPE>
     inline void append_buffer( DataBuffer1D<TYPE> fb )
     {
@@ -245,7 +246,7 @@ public:
         assert(settings.size==1);
         append_buffer(&value);
     }
-
+    */
     //void set_data(size_t m, size_t n, const double* pData);
     //void set_data(size_t m, size_t n, const float* pData);
     //void set_data(size_t m, size_t n, const int* pData);
@@ -374,32 +375,6 @@ size_t _append_to_array_1D(hid_t datatype, T data, hid_t dataset_id)
 
 
 
-//~ 
-//~ 
-//~ template<typename T>
-//~ size_t _write_to_array_1D(hid_t datatype, const T* pData, size_t N, hid_t dataset_id)
-//~ {
-    //~ // Extend the table:
-    //~ hsize_t new_data_dims[1] = {N}; 
-    //~ H5Dextend (dataset_id, new_data_dims);
-    //~ // And copy:
-    //~ hid_t filespace = H5Dget_space(dataset_id);
-    //~ hsize_t offset[1] = {0};
-    //~ hsize_t count[1] = {N};
-    //~ H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
-    //~ hsize_t dim1[1] = {N};
-    //~ hid_t memspace = H5Screate_simple(1, dim1, NULL);
-    //~ H5Dwrite (dataset_id, datatype, memspace, filespace, H5P_DEFAULT, pData);
-//~ 
-    //~ H5Sclose(memspace);
-    //~ H5Sclose(filespace);
-//~ 
-    //~ return N;
-//~ }
-//~ 
-//~ 
-
-
 
 
 
@@ -460,13 +435,6 @@ public:
 
     }
 
-    
-    //~ template<typename T>
-    //~ void set_data( const DataBuffer1D<T>& buff)
-    //~ {
-        //~ set_data(buff.size(), buff.get_data_pointer() );
-    //~ }
-
     std::string get_fullname() const;
     size_t get_length() const;
 };
@@ -512,8 +480,8 @@ public:
 
 
 
-    HDF5DataSet1DStdPtr create_dataset1D(const string& name, const FloatBuffer1D& data);
-    HDF5DataSet1DStdPtr create_dataset1D(const string& name, const IntBuffer1D& data);
+    //HDF5DataSet1DStdPtr create_dataset1D(const string& name, const FloatBuffer1D& data);
+    //HDF5DataSet1DStdPtr create_dataset1D(const string& name, const IntBuffer1D& data);
 
 
 

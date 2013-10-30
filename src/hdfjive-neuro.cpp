@@ -113,7 +113,7 @@ SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(FwdIt it, FwdIt 
 
 
 
-
+/*
 void SimulationResults::write_outputevents( const std::string& populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags )
 {
     HDF5GroupPtr pGroup = pSimulationGroup
@@ -148,7 +148,7 @@ void SimulationResults::write_inputevents( const std::string& populationname, in
     HDF5DataSet2DStdPtr pDataSet = pGroup->create_empty_dataset2D(record_name, HDF5DataSet2DStdSettings(H5T_NATIVE_FLOAT, 1) );
     pDataSet->set_data( times.size(), 1, times.get_data_pointer());
 }
-
+*/
 
 
 
