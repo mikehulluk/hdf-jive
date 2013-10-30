@@ -1,5 +1,8 @@
 
 #include "hdfjive.h"
+#include "hdfjive-hdfutil.h"
+
+
 
 
 class _HDF5Location
@@ -187,6 +190,9 @@ size_t HDF5DataSet1DStd::get_length() const
 
 void HDF5Group::add_attribute(const string& name, const string& value_in)
 {
+    return hdfjive::util::add_attribute(group_id, name, value_in);
+
+    /*
     std::string value = value_in;
     if( value.size() == 0)
     {
@@ -201,6 +207,8 @@ void HDF5Group::add_attribute(const string& name, const string& value_in)
     
     const char* attrs_data = value.c_str(); 
     H5Awrite(attr_id, datatype_id, attrs_data);
+    * */
+    
 }
 
 

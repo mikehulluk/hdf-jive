@@ -1,5 +1,5 @@
 
-
+/*
 // Explicitly instantiate the various templated functions:
 #include <vector>
 using std::vector;
@@ -87,7 +87,7 @@ template void SimulationResults::write_inputevents_onlytimes<ListFloat::iterator
 template void SimulationResults::write_inputevents_onlytimes<ListDouble::iterator>( const std::string& populationname, size_t index, const std::string& record_name, ListDouble::iterator it, ListDouble::iterator end, const TagList& );
 
 
-
+*/
 
 
 

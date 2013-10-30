@@ -3,7 +3,7 @@
 #ifndef __HDFJIVE_GUARD_H__
 #define __HDFJIVE_GUARD_H__
 
-#include "hdf5.h"
+#include <hdf5.h>
 #include <hdf5_hl.h>
 
 #include <boost/shared_ptr.hpp>
@@ -14,6 +14,11 @@
 #include <map>
 #include <boost/enable_shared_from_this.hpp>
 using namespace std;
+
+
+#include "hdfjive-hdfutil.h"
+
+
 
 // Signal Errors:
 herr_t my_hdf5_error_handler (hid_t estack_id, void *unused);
@@ -44,8 +49,6 @@ template<> struct CPPTypeToHDFType<long> { static hid_t get_hdf_type() { return 
 template<> struct CPPTypeToHDFType<float> { static hid_t get_hdf_type() { return H5T_NATIVE_FLOAT; }  };
 template<> struct CPPTypeToHDFType<double> { static hid_t get_hdf_type() { return H5T_NATIVE_DOUBLE; }  };
 template<> struct CPPTypeToHDFType<unsigned long> { static hid_t get_hdf_type() { return H5T_NATIVE_ULONG; }  };
-
-
 
 
 
@@ -170,6 +173,25 @@ public:
 
     std::string get_fullname() const;
     size_t get_length() const;
+
+
+
+
+
+
+
+
+
+    
+   void set_scaling_factor(double scaling_factor)
+    {
+        cout << "Setting scaling_factor: " << scaling_factor << "\n";
+        hdfjive::util::add_attribute(dataset_id,  "hdfjive:scaling", "myscalingfactor", true);
+    }
+
+ 
+
+    
 };
 
 

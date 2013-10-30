@@ -12,6 +12,8 @@
 #include <set>
 #include <boost/enable_shared_from_this.hpp>
 
+#include <boost/lexical_cast.hpp>
+
 
 #include <type_traits>
 
@@ -46,9 +48,6 @@ typedef std::set<std::string> TagList;
 
 
 
-
-
-
 class SharedTimeBuffer
 {
     HDF5DataSet2DStdPtr pArray;
@@ -59,6 +58,8 @@ public:
     size_t get_size() const { return pArray->get_length();  }
 
 };
+
+
 
 
 class SimulationResults
@@ -82,33 +83,103 @@ public:
      * Define the time buffer based on a fixed-size.
      */
     template<typename TIMEDATATYPE>
-    SharedTimeBufferPtr write_shared_time_buffer(size_t length, TIMEDATATYPE dt);
+    SharedTimeBufferPtr write_shared_time_buffer(size_t length, TIMEDATATYPE dt)
+    {
+        vector<TIMEDATATYPE> data(length);
+        for(size_t i=0;i<length;i++)
+            data[i] = i*dt;
+
+        return this->write_shared_time_buffer(length, &(data[0]));
+    }
 
     /**
      * Define the time buffer using an array of time-points.
      */
     template<typename TIMEDATATYPE>
-    SharedTimeBufferPtr write_shared_time_buffer(size_t length, TIMEDATATYPE* pData);
+    SharedTimeBufferPtr write_shared_time_buffer(size_t length, TIMEDATATYPE* pData, const std::string dataset_name=std::string("raw") )
+    {
+        n_shared_time_buffers++;
+        cout << "\n n_shared_time_buffers: " << n_shared_time_buffers << "\n";
+        string array_name = "time_array" + boost::lexical_cast<string>(n_shared_time_buffers);
+        //const std::string array_name = (boost::format("time_array %1% ") % ((int) n_shared_time_buffers)).str();
+        HDF5GroupPtr pGroup = pSimulationGroup
+            ->get_group("shared_time_arrays")
+            ->get_group(array_name);
+
+        HDF5DataSet2DStdPtr pDataSet = pGroup->create_empty_dataset2D(dataset_name, HDF5DataSet2DStdSettings(CPPTypeToHDFType<TIMEDATATYPE>::get_hdf_type(), 1));
+            
+        pDataSet->set_data( length, 1, pData);
+        return SharedTimeBufferPtr(new SharedTimeBuffer(pDataSet) );
+    }
 
     /**
      * Define the time buffer using an STL container
      */
     template<typename FwdIt>
-    SharedTimeBufferPtr write_shared_time_buffer(FwdIt it, FwdIt end);
+    SharedTimeBufferPtr write_shared_time_buffer(FwdIt it, FwdIt end)
+    {
+        typedef typename std::iterator_traits<FwdIt>::value_type T;
+
+        // Copy the data into a vector, so that its contiguous:
+        vector<T> data(it, end);
+
+        return write_shared_time_buffer<T>(data.size(), &(data[0]));
+    }
+
+
+
 
 
     /**
      * Record a trace to the hdfjive file, using a pointer to the raw data. The length of the array should be the same as the time-buffer.
      */
     template<typename TIMEDATATYPE>
-    void write_trace(const std::string& populationname, size_t index, const std::string& record_name, SharedTimeBufferPtr times, TIMEDATATYPE* pData, const TagList& tags=TagList());
+    void write_trace(const std::string& populationname, size_t index, const std::string& record_name, SharedTimeBufferPtr times, TIMEDATATYPE* pData, const TagList& tags_in=TagList())
+    {
+        HDF5GroupPtr pNodeGroup = pSimulationGroup
+            ->get_group(populationname)
+            ->get_group((boost::format("%04d")%index).str() )
+            ->get_group("variables")
+            ->get_group(record_name);
+
+        HDF5GroupPtr pDataGroup = pNodeGroup
+            ->get_group("raw");
+
+        // Create a list of tags, including those specified:
+        TagList tags(tags_in);
+        tags.insert(record_name);
+        tags.insert((boost::format("POPINDEX:%04d")%index).str() );
+        tags.insert((boost::format("POPNAME:%s")%populationname).str() );
+
+        // Add the tags to the node-group:
+        pNodeGroup->add_attribute("hdf-jive", "trace");
+        if(tags.size() != 0) pNodeGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ","));
+
+        // Soft-link the time:
+        pDataGroup->create_softlink(times->get_dataset(), "time");
+
+        // Create the data:
+        HDF5DataSet2DStdPtr pDataSet = pDataGroup->create_empty_dataset2D("data", HDF5DataSet2DStdSettings(CPPTypeToHDFType<TIMEDATATYPE>::get_hdf_type(), 1));
+        pDataSet->set_data( times->get_size(), 1, pData);
+    }
+
 
 
     /**
      * Record a trace to the hdfjive file from an STL container. The length of the container should be the same as the time-buffer.
      */
     template<typename FwdIt>
-    void write_trace(const std::string& populationname, size_t index, const std::string& record_name, SharedTimeBufferPtr times, FwdIt it, FwdIt end, const TagList& tags=TagList());
+    void write_trace(const std::string& populationname, size_t index, const std::string& record_name, SharedTimeBufferPtr times, FwdIt it, FwdIt end, const TagList& tags=TagList())
+    {
+        typedef typename std::iterator_traits<FwdIt>::value_type T;
+
+        // Copy the data into a vector, so that its contiguous:
+        vector<T> data(it, end);
+        assert(data.size() == times->get_size());
+
+        write_trace<T>(populationname, index, record_name, times,  &data[0], tags);
+    }
+
 
 
 
