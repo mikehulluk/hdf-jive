@@ -64,7 +64,7 @@ public:
 class SimulationResults
 {
 
-    int n_shared_time_buffers;
+    size_t n_shared_time_buffers;
     HDF5GroupPtr pSimulationGroup;
 
 
@@ -101,14 +101,14 @@ public:
      * Record a trace to the hdfjive file, using a pointer to the raw data. The length of the array should be the same as the time-buffer.
      */
     template<typename TIMEDATATYPE>
-    void write_trace(const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, TIMEDATATYPE* pData, const TagList& tags=TagList());
+    void write_trace(const std::string& populationname, size_t index, const std::string& record_name, SharedTimeBufferPtr times, TIMEDATATYPE* pData, const TagList& tags=TagList());
 
 
     /**
      * Record a trace to the hdfjive file from an STL container. The length of the container should be the same as the time-buffer.
      */
     template<typename FwdIt>
-    void write_trace(const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, FwdIt it, FwdIt end, const TagList& tags=TagList());
+    void write_trace(const std::string& populationname, size_t index, const std::string& record_name, SharedTimeBufferPtr times, FwdIt it, FwdIt end, const TagList& tags=TagList());
 
 
 
@@ -120,7 +120,7 @@ public:
 
      // A. With no parameters:
      // i. Simple, a pointer to an array of spike-times:
-    template<typename DATATYPE> void write_outputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, size_t n_events, DATATYPE* times, const TagList& tags=TagList() )
+    template<typename DATATYPE> void write_outputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, size_t n_events, DATATYPE* times, const TagList& tags=TagList() )
     {
         HDF5GroupPtr pGroup = pSimulationGroup
         ->get_group(populationname)
@@ -142,7 +142,7 @@ public:
 
     // ii. STL container of times
     template<typename FwdIt>
-    void write_outputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() )
+    void write_outputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() )
     {
         typedef typename std::iterator_traits<FwdIt>::value_type T;
         vector<T> data( it, end);
@@ -151,7 +151,7 @@ public:
 
 
     template<typename EXTRACTORTYPE, typename FwdIt>
-    void write_outputevents_byobjects_extractor(const std::string& populationname, int index, const std::string& record_name, FwdIt start, FwdIt stop, const TagList& tags=TagList() )
+    void write_outputevents_byobjects_extractor(const std::string& populationname, size_t index, const std::string& record_name, FwdIt start, FwdIt stop, const TagList& tags=TagList() )
     {
         // Check that the thing being iterated over, and the extractor take the same type:
         static_assert(std::is_same<typename std::iterator_traits<FwdIt>::value_type, typename EXTRACTORTYPE::EVENTTYPE>::value, "jklkjl");
@@ -205,7 +205,7 @@ public:
      */
      // A. With no parameters (no reference to input events):
      // i. Simple, a pointer to an array of spike-times:
-    template<typename DATATYPE> void write_inputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, size_t n_events, DATATYPE* times, const TagList& tags=TagList() )
+    template<typename DATATYPE> void write_inputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, size_t n_events, DATATYPE* times, const TagList& tags=TagList() )
     {
         HDF5GroupPtr pGroup = pSimulationGroup
         ->get_group(populationname)
@@ -227,7 +227,7 @@ public:
     }
     
     // ii. STL container of times
-    template<typename FwdIt> void write_inputevents_onlytimes( const std::string& populationname, int index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() )
+    template<typename FwdIt> void write_inputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() )
     {
         typedef typename std::iterator_traits<FwdIt>::value_type T;
         vector<T> data( it, end);
@@ -236,7 +236,7 @@ public:
 
     // B. With parameters, storing events as objects:
     template<typename EXTRACTORTYPE, typename FwdIt>
-    void write_inputevents_byobjects_extractor(const std::string& populationname, int index, const std::string& record_name, FwdIt start, FwdIt stop, const TagList& tags=TagList() )
+    void write_inputevents_byobjects_extractor(const std::string& populationname, size_t index, const std::string& record_name, FwdIt start, FwdIt stop, const TagList& tags=TagList() )
     {
         // Check that the thing being iterated over, and the extractor take the same type:
         static_assert(std::is_same<typename std::iterator_traits<FwdIt>::value_type, typename EXTRACTORTYPE::EVENTTYPE>::value, "jklkjl");
@@ -281,7 +281,7 @@ public:
         }
 
 
-        int sources[n_events][4];
+        size_t sources[n_events][4];
         for(FwdIt it=start; it!= stop;it++, i++)
         {
             for(size_t x=0;x<EXTRACTORTYPE::NSRCINDICES;x++)
@@ -290,7 +290,7 @@ public:
             }
         }
 
-        HDF5DataSet2DStdPtr pEventSrcs  = pGroup->create_empty_dataset2D("srcs", HDF5DataSet2DStdSettings( CPPTypeToHDFType<int>::get_hdf_type(), 4) );
+        HDF5DataSet2DStdPtr pEventSrcs  = pGroup->create_empty_dataset2D("srcs", HDF5DataSet2DStdSettings( CPPTypeToHDFType<size_t>::get_hdf_type(), 4) );
         pEventSrcs->set_data(n_events, 4, &sources[0][0]);
     }
 

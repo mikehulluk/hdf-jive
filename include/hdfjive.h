@@ -15,12 +15,8 @@
 #include <boost/enable_shared_from_this.hpp>
 using namespace std;
 
-
-
 // Signal Errors:
 herr_t my_hdf5_error_handler (hid_t estack_id, void *unused);
-
-
 
 
 // Forward declarations:
@@ -39,12 +35,6 @@ typedef boost::shared_ptr<HDF5DataSet2DStd> HDF5DataSet2DStdPtr;
 typedef boost::shared_ptr<HDF5DataSet1DStd> HDF5DataSet1DStdPtr;
 
 
-
-
-
-
-
-
 // Utility class for converting between <int,float> to <H5T_NATIVE_INT, H5T_NATIVE_FLOAT>
 template<typename T>
 struct CPPTypeToHDFType
@@ -53,6 +43,7 @@ template<> struct CPPTypeToHDFType<int> { static hid_t get_hdf_type() { return H
 template<> struct CPPTypeToHDFType<long> { static hid_t get_hdf_type() { return H5T_NATIVE_LONG; }  };
 template<> struct CPPTypeToHDFType<float> { static hid_t get_hdf_type() { return H5T_NATIVE_FLOAT; }  };
 template<> struct CPPTypeToHDFType<double> { static hid_t get_hdf_type() { return H5T_NATIVE_DOUBLE; }  };
+template<> struct CPPTypeToHDFType<unsigned long> { static hid_t get_hdf_type() { return H5T_NATIVE_ULONG; }  };
 
 
 
@@ -93,7 +84,6 @@ class HDF5DataSet2DStd : public  boost::enable_shared_from_this<HDF5DataSet2DStd
 {
     hid_t dataset_id;
     hid_t dataspace_id;
-
     size_t length;
 
 public:
@@ -224,7 +214,6 @@ class HDF5DataSet1DStd : public  boost::enable_shared_from_this<HDF5DataSet1DStd
 {
     hid_t dataset_id;
     hid_t dataspace_id;
-
     size_t length;
 
 public:

@@ -51,7 +51,7 @@ SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(size_t length, T
 
 
 template<typename TIMEDATATYPE>
-void SimulationResults::write_trace( const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times,  TIMEDATATYPE* pData, const TagList& tags_in )
+void SimulationResults::write_trace( const std::string& populationname, size_t index, const std::string& record_name, SharedTimeBufferPtr times,  TIMEDATATYPE* pData, const TagList& tags_in )
 {
     HDF5GroupPtr pNodeGroup = pSimulationGroup
         ->get_group(populationname)
@@ -82,7 +82,7 @@ void SimulationResults::write_trace( const std::string& populationname, int inde
 
 
 template<typename FwdIt>
-void SimulationResults::write_trace( const std::string& populationname, int index, const std::string& record_name, SharedTimeBufferPtr times, FwdIt it, FwdIt end, const TagList& tags)
+void SimulationResults::write_trace( const std::string& populationname, size_t index, const std::string& record_name, SharedTimeBufferPtr times, FwdIt it, FwdIt end, const TagList& tags)
 {
     typedef typename std::iterator_traits<FwdIt>::value_type T;
 
@@ -114,7 +114,7 @@ SharedTimeBufferPtr SimulationResults::write_shared_time_buffer(FwdIt it, FwdIt 
 
 
 /*
-void SimulationResults::write_outputevents( const std::string& populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags )
+void SimulationResults::write_outputevents( const std::string& populationname, size_t index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags )
 {
     HDF5GroupPtr pGroup = pSimulationGroup
         ->get_group(populationname)
@@ -132,7 +132,7 @@ void SimulationResults::write_outputevents( const std::string& populationname, i
 }
 
 
-void SimulationResults::write_inputevents( const std::string& populationname, int index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags )
+void SimulationResults::write_inputevents( const std::string& populationname, size_t index, const std::string& record_name, const FloatBuffer1D& times, const TagList& tags )
 {
     HDF5GroupPtr pGroup = pSimulationGroup
         ->get_group(populationname)
