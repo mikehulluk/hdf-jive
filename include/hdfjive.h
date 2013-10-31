@@ -177,7 +177,6 @@ public:
 
    void set_scaling_factor(double scaling_factor)
     {
-        cout << "Setting scaling_factor: " << scaling_factor << "\n";
         hdfjive::util::add_attribute(dataset_id,  "hdfjive:scaling", scaling_factor);
     }
 };
@@ -305,6 +304,11 @@ public:
 
     std::string get_fullname() const;
     size_t get_length() const;
+
+    void set_scaling_factor(double scaling_factor)
+    {
+        hdfjive::util::add_attribute(dataset_id,  "hdfjive:scaling", scaling_factor);
+    }
 };
 
 

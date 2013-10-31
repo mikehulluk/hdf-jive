@@ -33,11 +33,13 @@ using namespace std;
 class SimulationResults;
 class SimulationResultsFile;
 class SharedTimeBuffer;
+class EventDataSetTuple;
 
 
 typedef  boost::shared_ptr<SimulationResults> SimulationResultsPtr;
 typedef  boost::shared_ptr<SimulationResultsFile> SimulationResultsFilePtr;
 typedef  boost::shared_ptr<SharedTimeBuffer>  SharedTimeBufferPtr;
+
 
 typedef std::set<std::string> TagList;
 
@@ -60,6 +62,15 @@ public:
 };
 
 
+
+struct EventDataSetTuple
+{
+    HDF5DataSet1DStdPtr spiketimes;
+
+    EventDataSetTuple(HDF5DataSet1DStdPtr spiketimes)
+        : spiketimes(spiketimes)
+    {}
+};
 
 
 class SimulationResults
@@ -192,7 +203,7 @@ public:
      // A. With no parameters:
      // i. Simple, a pointer to an array of spike-times:
     template<typename DATATYPE>
-    void write_outputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, size_t n_events, DATATYPE* times, const TagList& tags=TagList() )
+    EventDataSetTuple write_outputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, size_t n_events, DATATYPE* times, const TagList& tags=TagList() )
     {
         HDF5GroupPtr pGroup = pSimulationGroup
         ->get_group(populationname)
@@ -210,20 +221,22 @@ public:
         {
             pDataSet->set_data( n_events, times);
         }
+
+        return EventDataSetTuple(pDataSet);
     }
 
     // ii. STL container of times
     template<typename FwdIt>
-    void write_outputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() )
+    EventDataSetTuple write_outputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() )
     {
         typedef typename std::iterator_traits<FwdIt>::value_type T;
         vector<T> data( it, end);
-        write_outputevents_onlytimes( populationname, index, record_name, data.size(), &data[0], tags);
+        return write_outputevents_onlytimes( populationname, index, record_name, data.size(), &data[0], tags);
     }
 
 
     template<typename EXTRACTORTYPE, typename FwdIt>
-    void write_outputevents_byobjects_extractor(const std::string& populationname, size_t index, const std::string& record_name, FwdIt start, FwdIt stop, const TagList& tags=TagList() )
+    EventDataSetTuple write_outputevents_byobjects_extractor(const std::string& populationname, size_t index, const std::string& record_name, FwdIt start, FwdIt stop, const TagList& tags=TagList() )
     {
         // Check that the thing being iterated over, and the extractor take the same type:
         static_assert(std::is_same<typename std::iterator_traits<FwdIt>::value_type, typename EXTRACTORTYPE::EVENTTYPE>::value, "jklkjl");
@@ -267,6 +280,8 @@ public:
             HDF5DataSet1DStdPtr pEventData  = pGroup->create_empty_dataset1D(pname, HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type()  ) );
             pEventData->set_data(n_events, parameters[p] );
         }
+
+        return EventDataSetTuple(pEventTimes);
     }
 
 
