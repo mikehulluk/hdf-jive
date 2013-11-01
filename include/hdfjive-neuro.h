@@ -112,7 +112,7 @@ public:
             ->get_group("shared_time_arrays")
             ->get_group(array_name);
 
-        HDF5DataSet2DStdPtr pDataSet = pGroup->create_empty_dataset2D(dataset_name, HDF5DataSet2DStdSettings(CPPTypeToHDFType<TIMEDATATYPE>::get_hdf_type(), 1));
+        HDF5DataSet2DStdPtr pDataSet = pGroup->create_empty_dataset2D(dataset_name, HDF5DataSet2DStdSettings(hdfjive::util::CPPTypeToHDFType<TIMEDATATYPE>::get_hdf_type(), 1));
             
         pDataSet->set_data( length, 1, pData);
         return SharedTimeBufferPtr(new SharedTimeBuffer(pDataSet) );
@@ -163,7 +163,7 @@ public:
         pDataGroup->create_softlink(times->get_dataset(), "time");
 
         // Create the data:
-        HDF5DataSet2DStdPtr pDataSet = pDataGroup->create_empty_dataset2D("data", HDF5DataSet2DStdSettings(CPPTypeToHDFType<TIMEDATATYPE>::get_hdf_type(), 1));
+        HDF5DataSet2DStdPtr pDataSet = pDataGroup->create_empty_dataset2D("data", HDF5DataSet2DStdSettings(hdfjive::util::CPPTypeToHDFType<TIMEDATATYPE>::get_hdf_type(), 1));
         pDataSet->set_data( times->get_size(), 1, pData);
 
         return pDataSet;
@@ -211,7 +211,7 @@ public:
         pGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
 
         // Create a dataset here with the data:
-        HDF5DataSet1DStdPtr pDataSet = pGroup->create_empty_dataset1D("event_times", HDF5DataSet1DStdSettings( CPPTypeToHDFType<DATATYPE>::get_hdf_type() ) );
+        HDF5DataSet1DStdPtr pDataSet = pGroup->create_empty_dataset1D("event_times", HDF5DataSet1DStdSettings( hdfjive::util::CPPTypeToHDFType<DATATYPE>::get_hdf_type() ) );
         if(n_events > 0)
         {
             pDataSet->set_data( n_events, times);
@@ -266,13 +266,13 @@ public:
         }
 
         // Create datasets with the data:
-        HDF5DataSet1DStdPtr pEventTimes = pGroup->create_empty_dataset1D("times",    HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type() ) );
+        HDF5DataSet1DStdPtr pEventTimes = pGroup->create_empty_dataset1D("times",    HDF5DataSet1DStdSettings( hdfjive::util::CPPTypeToHDFType<DTYPE>::get_hdf_type() ) );
         pEventTimes->set_data(n_events, times);
 
         for(size_t p=0;p<n_params;p++)
         {
             std::string pname = EXTRACTORTYPE::get_parameter_name(p); (boost::format("param-%d")%p).str();
-            HDF5DataSet1DStdPtr pEventData  = pGroup->create_empty_dataset1D(pname, HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type()  ) );
+            HDF5DataSet1DStdPtr pEventData  = pGroup->create_empty_dataset1D(pname, HDF5DataSet1DStdSettings( hdfjive::util::CPPTypeToHDFType<DTYPE>::get_hdf_type()  ) );
             pEventData->set_data(n_events, parameters[p] );
         }
 
@@ -301,7 +301,7 @@ public:
         pGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
 
         // Create a dataset here with the data:
-        HDF5DataSet1DStdPtr pDataSet = pGroup->create_empty_dataset1D("event_times", HDF5DataSet1DStdSettings( CPPTypeToHDFType<DATATYPE>::get_hdf_type() ) );
+        HDF5DataSet1DStdPtr pDataSet = pGroup->create_empty_dataset1D("event_times", HDF5DataSet1DStdSettings( hdfjive::util::CPPTypeToHDFType<DATATYPE>::get_hdf_type() ) );
         if(n_events > 0)
         {
             pDataSet->set_data( n_events, times);
@@ -354,13 +354,13 @@ public:
         }
 
         // Create datasets with the data:
-        HDF5DataSet1DStdPtr pEventTimes = pGroup->create_empty_dataset1D("times",    HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type() ) );
+        HDF5DataSet1DStdPtr pEventTimes = pGroup->create_empty_dataset1D("times",    HDF5DataSet1DStdSettings( hdfjive::util::CPPTypeToHDFType<DTYPE>::get_hdf_type() ) );
         pEventTimes->set_data(n_events, times);
 
         for(size_t p=0;p<n_params;p++)
         {
             std::string pname = EXTRACTORTYPE::get_parameter_name(p); (boost::format("param-%d")%p).str();
-            HDF5DataSet1DStdPtr pEventData  = pGroup->create_empty_dataset1D(pname, HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type()  ) );
+            HDF5DataSet1DStdPtr pEventData  = pGroup->create_empty_dataset1D(pname, HDF5DataSet1DStdSettings( hdfjive::util::CPPTypeToHDFType<DTYPE>::get_hdf_type()  ) );
             pEventData->set_data(n_events, parameters[p] );
         }
 
@@ -377,7 +377,7 @@ public:
                 }
             }
             
-            HDF5DataSet2DStdPtr pEventSrcs  = pGroup->create_empty_dataset2D("srcs", HDF5DataSet2DStdSettings( CPPTypeToHDFType<size_t>::get_hdf_type(), EXTRACTORTYPE::NSRCINDICES) );
+            HDF5DataSet2DStdPtr pEventSrcs  = pGroup->create_empty_dataset2D("srcs", HDF5DataSet2DStdSettings( hdfjive::util::CPPTypeToHDFType<size_t>::get_hdf_type(), EXTRACTORTYPE::NSRCINDICES) );
             pEventSrcs->set_data(n_events, 4, &sources[0][0]);
         }
 

@@ -133,7 +133,7 @@ public:
     inline
     void append(T dataelement)
     {
-        hid_t hdf5type = CPPTypeToHDFType<T>::get_hdf_type();
+        hid_t hdf5type = hdfjive::util::CPPTypeToHDFType<T>::get_hdf_type();
         assert(settings.type==hdf5type);
 
         // How big is the array:?
@@ -172,7 +172,7 @@ public:
     void set_data(size_t N, const T* pData)
     {
         // Is the datatype consistent?
-        hid_t hdf5type = CPPTypeToHDFType<T>::get_hdf_type();
+        hid_t hdf5type = hdfjive::util::CPPTypeToHDFType<T>::get_hdf_type();
         assert(settings.type==hdf5type);
 
         // Extend the table:
@@ -218,7 +218,7 @@ public:
     inline
     void append_buffer( const T* pData )
     {
-        hid_t hdf5type = CPPTypeToHDFType<T>::get_hdf_type();
+        hid_t hdf5type = hdfjive::util::CPPTypeToHDFType<T>::get_hdf_type();
         assert(settings.type==hdf5type);
 
         // How big is the array:?
@@ -258,7 +258,7 @@ public:
     inline
     void set_data(size_t M, size_t N, const T* pData)
     {
-        hid_t hdf5type = CPPTypeToHDFType<T>::get_hdf_type();
+        hid_t hdf5type = hdfjive::util::CPPTypeToHDFType<T>::get_hdf_type();
         assert(settings.type==hdf5type);
         assert(N==settings.size);
 
