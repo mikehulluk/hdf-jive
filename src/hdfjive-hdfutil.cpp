@@ -5,9 +5,10 @@
 #include <string>
 #include <iostream>
 
-using namespace std;
+#include "hdfjive-hdfutil.h"
 
-#include <hdfjive-hdfutil.h>
+
+
 
 
 

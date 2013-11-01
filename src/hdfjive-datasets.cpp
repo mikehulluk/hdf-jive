@@ -1,14 +1,15 @@
 
 
 
+
+
 #include "hdfjive.h"
 #include "hdfjive-datasets.h"
 
 
 
 
-
-HDF5DataSetAbstr::HDF5DataSetAbstr(const string& name, HDF5GroupPtrWeak pParent)
+HDF5DataSetAbstr::HDF5DataSetAbstr(const std::string& name, HDF5GroupPtrWeak pParent)
     : name(name), pParent(pParent), _length(0)
 {
     
@@ -21,10 +22,8 @@ std::string HDF5DataSetAbstr::get_fullname() const
 
 void HDF5DataSetAbstr::set_scaling_factor(double scaling_factor)
 {
-    hdfjive::util::add_attribute(dataset_id,  "hdfjive:scaling", scaling_factor);
+    hdfjive::util::add_attribute(*dataset_id,  "hdfjive:scaling", scaling_factor);
 }
-
-
 
 size_t HDF5DataSetAbstr::get_length() const
 {
@@ -38,43 +37,21 @@ void HDF5DataSetAbstr::_set_length(size_t length)
 
 
 
-
-
-
-
-
-HDF5DataSet1DStd::~HDF5DataSet1DStd()
+HDF5DataSetAbstr::~HDF5DataSetAbstr()
 {
-    H5Dclose(dataset_id);
-    H5Sclose(dataspace_id);
+    if(dataset_id) H5Dclose(*dataset_id);
+    if(dataspace_id) H5Sclose(*dataspace_id);
+    dataspace_id = boost::none;
+    dataset_id = boost::none;
 }
 
 
 
 
 
-    
 
-
-
-/*
-size_t HDF5DataSet1DStd::get_length() const
-{
-    return length;
-}
-*/
-
-
-
-
-
-
-
-
-
-HDF5DataSet1DStd::HDF5DataSet1DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet1DStdSettings& settings)
+HDF5DataSet1DStd::HDF5DataSet1DStd( const std::string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet1DStdSettings& settings)
     : HDF5DataSetAbstr(name, pParent),
-      //length(0),
       settings(settings)
 {
     hsize_t data_dims[1] = {0};
@@ -85,14 +62,13 @@ HDF5DataSet1DStd::HDF5DataSet1DStd( const string& name, HDF5GroupPtrWeak pParent
     hid_t prop = H5Pcreate(H5P_DATASET_CREATE);
     
     // -- chunking:
-    hsize_t chunk_dims[1] = {50};
-    //hsize_t chunk_dims[1] = {21}; 
+    hsize_t chunk_dims[1] = {settings.chunksize}; // (defaults to 50)
     H5Pset_chunk (prop, 1, chunk_dims);
 
     // -- compression:
-    H5Pset_deflate( prop, 6); 
+    if(settings.compression_level) H5Pset_deflate( prop, *settings.compression_level); 
 
-    dataset_id = H5Dcreate2 (pParent.lock()->group_id, name.c_str(), settings.type, dataspace_id, H5P_DEFAULT, prop, H5P_DEFAULT);
+    dataset_id = H5Dcreate2 (pParent.lock()->group_id, name.c_str(), settings.type, *dataspace_id, H5P_DEFAULT, prop, H5P_DEFAULT);
     H5Pclose (prop);
 }
 
@@ -100,18 +76,8 @@ HDF5DataSet1DStd::HDF5DataSet1DStd( const string& name, HDF5GroupPtrWeak pParent
 
 
 
-
-
-
-
-
-
-
-
-
-
-HDF5DataSet2DStd::HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet2DStdSettings& settings)
-    :length(0), name(name), pParent(pParent), settings(settings)
+HDF5DataSet2DStd::HDF5DataSet2DStd( const std::string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet2DStdSettings& settings)
+    : HDF5DataSetAbstr(name, pParent), settings(settings)
 {
     hsize_t data_dims[2] = {0, settings.size};
     hsize_t data_max_dims[2] = {H5S_UNLIMITED, settings.size} ;
@@ -121,58 +87,14 @@ HDF5DataSet2DStd::HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent
     hid_t prop = H5Pcreate(H5P_DATASET_CREATE);
 
     // -- chunking:
-    hsize_t chunk_dims[2] = {50, settings.size};
-    //hsize_t chunk_dims[2] = {21, settings.size};
+    hsize_t chunk_dims[2] = {settings.chunksize, settings.size};
     H5Pset_chunk (prop, 2, chunk_dims);
     
     // -- compression:
-    H5Pset_deflate( prop, 6);
+    if(settings.compression_level) H5Pset_deflate( prop, *settings.compression_level); 
 
-    dataset_id = H5Dcreate2 (pParent.lock()->group_id, name.c_str(), settings.type, dataspace_id, H5P_DEFAULT, prop, H5P_DEFAULT);
+    dataset_id = H5Dcreate2 (pParent.lock()->group_id, name.c_str(), settings.type, *dataspace_id, H5P_DEFAULT, prop, H5P_DEFAULT);
     H5Pclose (prop);
 }
-
-
-
-
-HDF5DataSet2DStd::~HDF5DataSet2DStd()
-{
-    H5Dclose(dataset_id);
-    H5Sclose(dataspace_id);
-}
-
-std::string HDF5DataSet2DStd::get_fullname() const
-{
-    return pParent.lock()->get_fullname() + "/" + name;
-}
-
-
-
-size_t HDF5DataSet2DStd::get_length() const
-{
-    return length;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

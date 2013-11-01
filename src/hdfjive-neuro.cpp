@@ -24,8 +24,3 @@ SimulationResultsPtr SimulationResultsFile::Simulation(const std::string& simula
 }
 
 
-
-
-
-
-#include "hdfjive-neuro_tmpl-inst.cpp"

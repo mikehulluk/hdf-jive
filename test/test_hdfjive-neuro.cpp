@@ -3,11 +3,6 @@
 
 #include <boost/assign/list_of.hpp>
 #include <vector>
-#include <list>
-#include <array>
-using std::list;
-using std::vector;
-using std::array;
 using boost::assign::list_of;
 
 #include "boost/tuple/tuple.hpp"
@@ -36,9 +31,9 @@ void test_pointers()
 
 void test_stl()
 {
-    vector<double> time_data = list_of<double>(2.4)(5.6)(9.6)(14.3);
-    list<float>  voltage_data = list_of<float>(4.2)(6.3)(6.7)(13.4);
-    vector<int>  int_data = list_of<int>(4)(3)(5)(6);
+    std::vector<double> time_data = list_of<double>(2.4)(5.6)(9.6)(14.3);
+    std::list<float>  voltage_data = list_of<float>(4.2)(6.3)(6.7)(13.4);
+    std::vector<int>  int_data = list_of<int>(4)(3)(5)(6);
 
     SimulationResultsPtr output = SimulationResultsFile("MyResults2.hdf").Simulation("Sim1");
     SharedTimeBufferPtr times = output->write_shared_time_buffer(time_data.begin(), time_data.end());
@@ -69,10 +64,10 @@ void test_output_events_1()
     double pTimes3[] =  {2.3, 6.9, 4.7, 9.7, 34.5};
 
     // ii. by stl containers:
-    vector<int>  pTimes0STL(pTimes0, pTimes0+5);
-    list<long>   pTimes1STL(pTimes1, pTimes1+5);
-    vector<float>pTimes2STL(pTimes2, pTimes2+5);
-    list<double> pTimes3STL(pTimes3, pTimes3+5);
+    std::vector<int>  pTimes0STL(pTimes0, pTimes0+5);
+    std::list<long>   pTimes1STL(pTimes1, pTimes1+5);
+    std::vector<float>pTimes2STL(pTimes2, pTimes2+5);
+    std::list<double> pTimes3STL(pTimes3, pTimes3+5);
 
     SimulationResultsPtr output = SimulationResultsFile("MyResults3.hdf").Simulation("Sim1");
 
@@ -120,7 +115,7 @@ struct MyEventExtractor0
     static const int NPARAMS = 0;
     static float get_time(const EVENTTYPE& o) { return o.time; }
     static float get_parameter_value(const EVENTTYPE& o, int i) {  assert(0);  }
-    static string get_parameter_name( int i) { assert(0); }
+    static std::string get_parameter_name( int i) { assert(0); }
 };
 
 
@@ -131,7 +126,7 @@ struct MyEventExtractor1
     static const int NPARAMS = 1;
     static float get_time(const EVENTTYPE& o) { return o.TIME; }
     static float get_parameter_value(const EVENTTYPE& o, int i) { switch(i){ case 0: return o.P0;  default: assert(0); } }
-    static string get_parameter_name( int i) { switch(i){ case 0: return "P0";   default: assert(0); } }
+    static std::string get_parameter_name( int i) { switch(i){ case 0: return "P0";   default: assert(0); } }
 };
 
 
@@ -143,7 +138,7 @@ struct MyEventExtractor2
     static const int NPARAMS = 2;
     static float get_time(const EVENTTYPE& o) { return o.my_time; }
     static float get_parameter_value(const EVENTTYPE& o, int i) { switch(i){ case 0: return o.P0; case 1: return o.P1; default: assert(0); } }
-    static string get_parameter_name( int i) { switch(i){ case 0: return "P0"; case 1: return "P1";    default: assert(0); } }
+    static std::string get_parameter_name( int i) { switch(i){ case 0: return "P0"; case 1: return "P1";    default: assert(0); } }
 };
 
 
@@ -151,12 +146,12 @@ struct MyEventExtractor2
 void test_output_events_2()
 {
 
-    vector<MyEventType0> evts_0_vec;
-    list<MyEventType0> evts_0_list;
-    vector<MyEventType1> evts_1_vec;
-    list<MyEventType1> evts_1_list;
-    vector<MyEventType2> evts_2_vec;
-    list<MyEventType2> evts_2_list;
+    std::vector<MyEventType0> evts_0_vec;
+    std::list<MyEventType0> evts_0_list;
+    std::vector<MyEventType1> evts_1_vec;
+    std::list<MyEventType1> evts_1_list;
+    std::vector<MyEventType2> evts_2_vec;
+    std::list<MyEventType2> evts_2_list;
 
     // Create some events (0-param):
     MyEventType0 evt0_a(0.2f);
@@ -213,10 +208,10 @@ void test_input_events_1()
     double pTimes3[] =  {2.3, 6.9, 4.7, 9.7, 34.5};
 
     // ii. by stl containers:
-    vector<int>   pTimes0STL(pTimes0, pTimes0+5);
-    list<long>    pTimes1STL(pTimes1, pTimes1+5);
-    vector<float> pTimes2STL(pTimes2, pTimes2+5);
-    list<double>  pTimes3STL(pTimes3, pTimes3+5);
+    std::vector<int>   pTimes0STL(pTimes0, pTimes0+5);
+    std::list<long>    pTimes1STL(pTimes1, pTimes1+5);
+    std::vector<float> pTimes2STL(pTimes2, pTimes2+5);
+    std::list<double>  pTimes3STL(pTimes3, pTimes3+5);
 
     SimulationResultsPtr output = SimulationResultsFile("MyResults5.hdf").Simulation("Sim1");
 
@@ -280,7 +275,7 @@ struct MyInputEventExtractor0
     static const int NPARAMS = 0;
     static DTYPE get_time(const EVENTTYPE& o) { return o.time; }
     static DTYPE get_parameter_value(const EVENTTYPE& o, int i) {  assert(0);  }
-    static string get_parameter_name( int i) { assert(0); }
+    static std::string get_parameter_name( int i) { assert(0); }
 
     static const size_t NSRCINDICES = 4;
     static DTYPE get_srcindex_value(const EVENTTYPE& o, size_t i)
@@ -293,7 +288,7 @@ struct MyInputEventExtractor0
             default: assert(0);
         }
     }
-    static string get_index_name( size_t i)
+    static std::string get_index_name( size_t i)
     {
         switch(i){
             case 0: return "PopIndex";
@@ -302,7 +297,6 @@ struct MyInputEventExtractor0
             case 3: return "EvtIndex";
             default: assert(0);
         }
-
     }
 
 };
@@ -318,7 +312,7 @@ struct MyInputEventExtractor2
     static const int NPARAMS = 2;
     static DTYPE get_time(const EVENTTYPE& o) { return o.my_time; }
     static DTYPE get_parameter_value(const EVENTTYPE& o, int i) { switch(i){ case 0: return o.P0; case 1: return o.P1; default: assert(0); } }
-    static string get_parameter_name( int i) { switch(i){ case 0: return "P0"; case 1: return "P1";    default: assert(0); } }
+    static std::string get_parameter_name( int i) { switch(i){ case 0: return "P0"; case 1: return "P1";    default: assert(0); } }
 
 
     static const size_t NSRCINDICES = 4;
@@ -332,7 +326,7 @@ struct MyInputEventExtractor2
             default: assert(0);
         }
     }
-    static string get_index_name(size_t i)
+    static std::string get_index_name(size_t i)
     {
         switch(i){
             case 0: return "PopIndex";
@@ -365,12 +359,12 @@ void test_input_events_3()
     /* Create some output-events: */
     // ==============================
     //
-    vector<MyEventType0> evts_0_vec;
-    list<MyEventType0> evts_0_list;
-    vector<MyEventType1> evts_1_vec;
-    list<MyEventType1> evts_1_list;
-    vector<MyEventType2> evts_2_vec;
-    list<MyEventType2> evts_2_list;
+    std::vector<MyEventType0> evts_0_vec;
+    std::list<MyEventType0> evts_0_list;
+    std::vector<MyEventType1> evts_1_vec;
+    std::list<MyEventType1> evts_1_list;
+    std::vector<MyEventType2> evts_2_vec;
+    std::list<MyEventType2> evts_2_list;
 
     // Create some events (0-param):
     MyEventType0 evt0_a(0.2f);
@@ -410,8 +404,8 @@ void test_input_events_3()
 
 
     // Save the events:
-    vector<MyInputEventType0> in_evts_float0_vec;
-    vector<MyInputEventType2> in_evts_float2_vec;
+    std::vector<MyInputEventType0> in_evts_float0_vec;
+    std::vector<MyInputEventType2> in_evts_float2_vec;
 
     // Input events (0-param):
     in_evts_float0_vec.push_back(MyInputEventType0(0,0,0,0, 0));

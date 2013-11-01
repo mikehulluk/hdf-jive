@@ -3,33 +3,28 @@
 #define __HDFJIVENEURO_GUARD_H__
 
 
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
+// Standard includes:
+// ===================
 #include <string>
 #include <vector>
 #include <map>
 #include <list>
 #include <set>
-#include <boost/enable_shared_from_this.hpp>
-
-#include <boost/lexical_cast.hpp>
-
-
 #include <type_traits>
 
-
-using namespace std;
-
-
-
-#include "hdfjive.h"
-//#include "hdfjive-events.h"
-
-
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string/join.hpp>
 
 
+
+
+
+// Forward declarations:
+// =====================
 class SimulationResults;
 class SimulationResultsFile;
 class SharedTimeBuffer;
@@ -40,11 +35,14 @@ typedef  boost::shared_ptr<SimulationResults> SimulationResultsPtr;
 typedef  boost::shared_ptr<SimulationResultsFile> SimulationResultsFilePtr;
 typedef  boost::shared_ptr<SharedTimeBuffer>  SharedTimeBufferPtr;
 
-
 typedef std::set<std::string> TagList;
 
 
 
+
+
+
+#include "hdfjive.h"
 
 
 
@@ -80,7 +78,7 @@ class SimulationResults
     HDF5GroupPtr pSimulationGroup;
 
 
-    std::map<string, size_t> population_indices;
+    std::map<std::string, size_t> population_indices;
 
 
 
@@ -96,7 +94,7 @@ public:
     template<typename TIMEDATATYPE>
     SharedTimeBufferPtr write_shared_time_buffer(size_t length, TIMEDATATYPE dt)
     {
-        vector<TIMEDATATYPE> data(length);
+        std::vector<TIMEDATATYPE> data(length);
         for(size_t i=0;i<length;i++)
             data[i] = i*dt;
 
@@ -109,10 +107,7 @@ public:
     template<typename TIMEDATATYPE>
     SharedTimeBufferPtr write_shared_time_buffer(size_t length, TIMEDATATYPE* pData, const std::string dataset_name=std::string("raw") )
     {
-        n_shared_time_buffers++;
-        cout << "\n n_shared_time_buffers: " << n_shared_time_buffers << "\n";
-        //string array_name = "time_array" + boost::lexical_cast<string>(n_shared_time_buffers);
-        std::string array_name = (boost::format("timearray_%1% ") % ((int) n_shared_time_buffers)).str();
+        std::string array_name = (boost::format("timearray_%1% ") % n_shared_time_buffers++).str();
         HDF5GroupPtr pGroup = pSimulationGroup
             ->get_group("shared_time_arrays")
             ->get_group(array_name);
@@ -131,7 +126,7 @@ public:
     {
         typedef typename std::iterator_traits<FwdIt>::value_type T;
         // Copy the data into a vector, so that its contiguous:
-        vector<T> data(it, end);
+        std::vector<T> data(it, end);
         return write_shared_time_buffer<T>(data.size(), &(data[0]));
     }
 
@@ -185,7 +180,7 @@ public:
         typedef typename std::iterator_traits<FwdIt>::value_type T;
 
         // Copy the data into a vector, so that its contiguous:
-        vector<T> data(it, end);
+        std::vector<T> data(it, end);
         assert(data.size() == times->get_size());
 
         return write_trace<T>(populationname, index, record_name, times,  &data[0], tags);
@@ -230,7 +225,7 @@ public:
     EventDataSetTuple write_outputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() )
     {
         typedef typename std::iterator_traits<FwdIt>::value_type T;
-        vector<T> data( it, end);
+        std::vector<T> data( it, end);
         return write_outputevents_onlytimes( populationname, index, record_name, data.size(), &data[0], tags);
     }
 
@@ -276,7 +271,7 @@ public:
 
         for(size_t p=0;p<n_params;p++)
         {
-            string pname = EXTRACTORTYPE::get_parameter_name(p); (boost::format("param-%d")%p).str();
+            std::string pname = EXTRACTORTYPE::get_parameter_name(p); (boost::format("param-%d")%p).str();
             HDF5DataSet1DStdPtr pEventData  = pGroup->create_empty_dataset1D(pname, HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type()  ) );
             pEventData->set_data(n_events, parameters[p] );
         }
@@ -319,7 +314,7 @@ public:
     EventDataSetTuple write_inputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, FwdIt it, FwdIt end, const TagList& tags=TagList() )
     {
         typedef typename std::iterator_traits<FwdIt>::value_type T;
-        vector<T> data( it, end);
+        std::vector<T> data( it, end);
         return write_inputevents_onlytimes( populationname, index, record_name, data.size(), &data[0], tags);
     }
 
@@ -364,7 +359,7 @@ public:
 
         for(size_t p=0;p<n_params;p++)
         {
-            string pname = EXTRACTORTYPE::get_parameter_name(p); (boost::format("param-%d")%p).str();
+            std::string pname = EXTRACTORTYPE::get_parameter_name(p); (boost::format("param-%d")%p).str();
             HDF5DataSet1DStdPtr pEventData  = pGroup->create_empty_dataset1D(pname, HDF5DataSet1DStdSettings( CPPTypeToHDFType<DTYPE>::get_hdf_type()  ) );
             pEventData->set_data(n_events, parameters[p] );
         }

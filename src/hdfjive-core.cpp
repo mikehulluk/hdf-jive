@@ -7,12 +7,12 @@
 
 class _HDF5Location
 {
-    string location;
+    std::string location;
     bool _is_absolute;
     public:
-        _HDF5Location(const string& location_in)
+        _HDF5Location(const std::string& location_in)
         {
-            string location = location_in;
+            std::string location = location_in;
 
             if( location[0] == '/')
             {
@@ -34,7 +34,7 @@ class _HDF5Location
         bool is_local() const
         {
             size_t sep_loc = location.find('/');
-            return (sep_loc == string::npos);
+            return (sep_loc == std::string::npos);
         }
 
         bool is_absolute() const
@@ -42,13 +42,13 @@ class _HDF5Location
             return _is_absolute;
         }
 
-        string get_local_path() const
+        std::string get_local_path() const
         {
             size_t sep_loc = location.find('/');
             return location.substr(0,sep_loc);
         }
 
-        string get_child_path() const
+        std::string get_child_path() const
         {
             assert( !is_local() );
             size_t sep_loc = location.find('/');
@@ -64,7 +64,7 @@ class _HDF5Location
 
 
 
-void HDF5Group::add_attribute(const string& name, const string& value_in)
+void HDF5Group::add_attribute(const std::string& name, const std::string& value_in)
 {
     return hdfjive::util::add_attribute(group_id, name, value_in);
 }
@@ -84,7 +84,7 @@ std::string HDF5Group::get_fullname() const
 
 
 
-HDF5Group::HDF5Group(const string& location, HDF5FilePtrWeak fileptr,  HDF5GroupPtrWeak parentptr)
+HDF5Group::HDF5Group(const std::string& location, HDF5FilePtrWeak fileptr,  HDF5GroupPtrWeak parentptr)
     :location(location), fileptr(fileptr), pParent(parentptr)
 {
 
@@ -123,7 +123,7 @@ HDF5Group::~HDF5Group()
 
 
 
-HDF5GroupPtr HDF5Group::get_subgroup(const string& location_in)
+HDF5GroupPtr HDF5Group::get_subgroup(const std::string& location_in)
 {
     _HDF5Location loc(location_in);
 
@@ -143,9 +143,9 @@ HDF5GroupPtr HDF5Group::get_subgroup(const string& location_in)
 
 
 
-HDF5GroupPtr HDF5Group::get_subgrouplocal(const string& location)
+HDF5GroupPtr HDF5Group::get_subgrouplocal(const std::string& location)
 {
-    assert( location.find("/") == string::npos );
+    assert( location.find("/") == std::string::npos );
 
     // Group does not exist:
     if( groups.find(location) == groups.end() )
@@ -170,7 +170,7 @@ bool HDF5Group::is_root() const
 
 
 
-HDF5DataSet2DStdPtr HDF5Group::create_empty_dataset2D(const string& name, const HDF5DataSet2DStdSettings& settings)
+HDF5DataSet2DStdPtr HDF5Group::create_empty_dataset2D(const std::string& name, const HDF5DataSet2DStdSettings& settings)
 {
     assert( datasets_2d.find(name) == datasets_2d.end() );
     datasets_2d[name] = HDF5DataSet2DStdPtr( new HDF5DataSet2DStd(name, HDF5GroupPtrWeak(shared_from_this()), settings ) );
@@ -178,7 +178,7 @@ HDF5DataSet2DStdPtr HDF5Group::create_empty_dataset2D(const string& name, const 
 }
 
 
-HDF5DataSet1DStdPtr HDF5Group::create_empty_dataset1D(const string& name, const HDF5DataSet1DStdSettings& settings)
+HDF5DataSet1DStdPtr HDF5Group::create_empty_dataset1D(const std::string& name, const HDF5DataSet1DStdSettings& settings)
 {
     assert( datasets_1d.find(name) == datasets_1d.end() );
     datasets_1d[name] = HDF5DataSet1DStdPtr( new HDF5DataSet1DStd(name, HDF5GroupPtrWeak(shared_from_this()), settings ) );
@@ -187,7 +187,7 @@ HDF5DataSet1DStdPtr HDF5Group::create_empty_dataset1D(const string& name, const 
 
 
 
-HDF5DataSet2DStdPtr HDF5Group::get_dataset2D(const string& name)
+HDF5DataSet2DStdPtr HDF5Group::get_dataset2D(const std::string& name)
 {
     _HDF5Location loc(name);
     // Sanity checks:
@@ -205,7 +205,7 @@ HDF5DataSet2DStdPtr HDF5Group::get_dataset2D(const string& name)
 }
 
 
-HDF5DataSet1DStdPtr HDF5Group::get_dataset1D(const string& name)
+HDF5DataSet1DStdPtr HDF5Group::get_dataset1D(const std::string& name)
 {
     _HDF5Location loc(name);
     // Sanity checks:
@@ -282,10 +282,9 @@ void HDF5File::init()
 }
 
 
-HDF5File::HDF5File(const string& filename)
+HDF5File::HDF5File(const std::string& filename)
         : filename(filename)
 {
-        //cout << "HDFFile( " << filename << " )";
         file_id = H5Fcreate(filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 }
 
@@ -296,11 +295,11 @@ HDF5File::~HDF5File()
 
 
     H5Fclose(this->file_id);
-    cout << "\nHDF-jive:closed file: " << filename << "\n" << std::flush;
+    std::cout << "\nHDF-jive:closed file: " << filename << "\n" << std::flush;
 }
 
 
-HDF5GroupPtr HDF5File::get_group(const string& location)
+HDF5GroupPtr HDF5File::get_group(const std::string& location)
 {
 
     if(!root_group)
@@ -313,7 +312,7 @@ HDF5GroupPtr HDF5File::get_group(const string& location)
 }
 
 
-HDF5DataSet2DStdPtr HDF5File::get_dataset2D(const string& location)
+HDF5DataSet2DStdPtr HDF5File::get_dataset2D(const std::string& location)
 {
     if(!root_group)
     {

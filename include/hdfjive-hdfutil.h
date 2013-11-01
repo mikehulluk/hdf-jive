@@ -8,6 +8,20 @@
 #include <string>
 
 
+
+// Utility class for converting between <int,float> to <H5T_NATIVE_INT, H5T_NATIVE_FLOAT>
+template<typename T>
+struct CPPTypeToHDFType
+{ };
+template<> struct CPPTypeToHDFType<int> { static hid_t get_hdf_type() { return H5T_NATIVE_INT; }  };
+template<> struct CPPTypeToHDFType<long> { static hid_t get_hdf_type() { return H5T_NATIVE_LONG; }  };
+template<> struct CPPTypeToHDFType<float> { static hid_t get_hdf_type() { return H5T_NATIVE_FLOAT; }  };
+template<> struct CPPTypeToHDFType<double> { static hid_t get_hdf_type() { return H5T_NATIVE_DOUBLE; }  };
+template<> struct CPPTypeToHDFType<unsigned long> { static hid_t get_hdf_type() { return H5T_NATIVE_ULONG; }  };
+
+
+
+
 namespace hdfjive
 {
 namespace util    
