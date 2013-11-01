@@ -49,34 +49,45 @@ public:
 
 
 
-class HDF5DataSetAbstr
+struct HDF5DataSetAbstr
 {
     hid_t dataset_id;
     hid_t dataspace_id;
-
-}
-
-
-
-
-
-
-
-class HDF5DataSet1DStd : public  boost::enable_shared_from_this<HDF5DataSet1DStd>
-{
-    hid_t dataset_id;
-    hid_t dataspace_id;
-    size_t length;
-
-public:
     const string name;
     HDF5GroupPtrWeak pParent;
+
+    HDF5DataSetAbstr( const string& name, HDF5GroupPtrWeak pParent );
+
+
+    std::string get_fullname() const;
+    void set_scaling_factor(double scaling_factor);
+
+
+    void _set_length(size_t);
+    size_t get_length() const;
+
+private:
+    size_t _length;
+};
+
+
+
+
+
+
+
+class HDF5DataSet1DStd : public  boost::enable_shared_from_this<HDF5DataSet1DStd>, public HDF5DataSetAbstr
+{
+
+public:
+    
+    
     HDF5DataSet1DStdSettings settings;
 
     HDF5DataSet1DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet1DStdSettings& settings);
     ~HDF5DataSet1DStd();
 
-
+    
     template<typename T>
     inline
     void append(T dataelement)
@@ -91,7 +102,7 @@ public:
         H5Sclose(dataspace);
 
         hsize_t curr_size = dims[0];
-        assert( curr_size == this->length() );
+        assert( curr_size == this->get_length() );
 
         // Extend the table:
         hsize_t new_data_dims[1] = {curr_size+1};
@@ -110,8 +121,8 @@ public:
         H5Sclose(memspace);
         H5Sclose(filespace);
 
-        this->length = new_data_dims[0];
-
+        //this->length = new_data_dims[0];
+        this->_set_length(new_data_dims[0]);
     }
 
 
@@ -141,17 +152,9 @@ public:
         H5Sclose(filespace);
 
         // Store the length:
-        length = N;
-
+        this->_set_length(N);
     }
 
-    std::string get_fullname() const;
-    size_t get_length() const;
-
-    void set_scaling_factor(double scaling_factor)
-    {
-        hdfjive::util::add_attribute(dataset_id,  "hdfjive:scaling", scaling_factor);
-    }
 };
 
 
@@ -166,6 +169,20 @@ class HDF5DataSet2DStd : public  boost::enable_shared_from_this<HDF5DataSet2DStd
 public:
     const string name;
     HDF5GroupPtrWeak pParent;
+
+
+    std::string get_fullname() const;
+    size_t get_length() const;
+
+
+   void set_scaling_factor(double scaling_factor)
+    {
+        hdfjive::util::add_attribute(dataset_id,  "hdfjive:scaling", scaling_factor);
+    }
+
+
+
+    
     HDF5DataSet2DStdSettings settings;
 
     HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet2DStdSettings& settings);
@@ -245,14 +262,6 @@ public:
 
 
 
-    std::string get_fullname() const;
-    size_t get_length() const;
-
-
-   void set_scaling_factor(double scaling_factor)
-    {
-        hdfjive::util::add_attribute(dataset_id,  "hdfjive:scaling", scaling_factor);
-    }
 };
 
 
