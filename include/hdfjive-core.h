@@ -5,6 +5,10 @@
 
 
 
+// Standard libraries:
+// =====================
+#include <map>
+#include <string>
 
 
 
@@ -21,22 +25,16 @@ typedef boost::weak_ptr<HDF5File> HDF5FilePtrWeak;
 typedef boost::shared_ptr<HDF5Group> HDF5GroupPtr;
 typedef boost::weak_ptr<HDF5Group> HDF5GroupPtrWeak;
 
-// Signal Errors:
-herr_t my_hdf5_error_handler (hid_t estack_id, void *unused);
-
-
-
-// Standard libraries:
-#include <map>
-#include <string>
-
-
-
+herr_t my_hdf5_error_handler (hid_t estack_id, void *unused);  // (Signal Errors:)
 
 
 
 
 #include "hdfjive-datasets.h"
+
+
+
+
 
 
 class HDF5Group : public boost::enable_shared_from_this<HDF5Group>

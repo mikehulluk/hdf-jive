@@ -292,8 +292,6 @@ HDF5File::HDF5File(const std::string& filename)
 HDF5File::~HDF5File()
 {
     root_group.reset();
-
-
     H5Fclose(this->file_id);
     std::cout << "\nHDF-jive:closed file: " << filename << "\n" << std::flush;
 }
@@ -301,14 +299,11 @@ HDF5File::~HDF5File()
 
 HDF5GroupPtr HDF5File::get_group(const std::string& location)
 {
-
     if(!root_group)
     {
         init();
     }
-
     return this->root_group->get_subgroup(location);
-
 }
 
 

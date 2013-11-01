@@ -12,7 +12,6 @@
 HDF5DataSetAbstr::HDF5DataSetAbstr(const std::string& name, HDF5GroupPtrWeak pParent)
     : name(name), pParent(pParent), _length(0)
 {
-    
 }
 
 std::string HDF5DataSetAbstr::get_fullname() const

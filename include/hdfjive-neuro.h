@@ -398,7 +398,6 @@ class SimulationResultsFile
 {
     HDF5FilePtr file;
 
-
 public:
     SimulationResultsFile(const std::string& filename);
     SimulationResultsPtr Simulation(const std::string& simulationname);
