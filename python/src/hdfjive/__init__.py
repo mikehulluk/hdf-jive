@@ -37,9 +37,14 @@ class SimulationResultEventsProxy(object):
     def __init__(self,group):
         self.group = group
         self.tags = group._v_attrs['hdf-jive:tags'].split(",")
-        assert len(group._v_children) == 1
 
-        self.arr = group._v_children.values()[0]
+
+        times = group._f_getChild("times")
+        
+        #print group.times
+        #assert len(group._v_children) in (1,2)
+
+        self.arr = times
 
     @property
     def evt_times(self):

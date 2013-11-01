@@ -60,130 +60,6 @@ class _HDF5Location
 
 
 
-HDF5DataSet2DStd::HDF5DataSet2DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet2DStdSettings& settings)
-    :length(0), name(name), pParent(pParent), settings(settings)
-{
-    hsize_t data_dims[2] = {0, settings.size};
-    hsize_t data_max_dims[2] = {H5S_UNLIMITED, settings.size} ;
-    dataspace_id = H5Screate_simple(2, data_dims, data_max_dims);
-
-    hsize_t chunk_dims[2] = {50, settings.size}; 
-    hid_t prop = H5Pcreate(H5P_DATASET_CREATE);
-    H5Pset_chunk (prop, 2, chunk_dims);
-
-
-    dataset_id = H5Dcreate2 (pParent.lock()->group_id, name.c_str(), settings.type, dataspace_id, H5P_DEFAULT, prop, H5P_DEFAULT);
-    H5Pclose (prop);
-}
-
-
-
-
-HDF5DataSet2DStd::~HDF5DataSet2DStd()
-{
-    H5Dclose(dataset_id);
-    H5Sclose(dataspace_id);
-}
-
-std::string HDF5DataSet2DStd::get_fullname() const
-{
-    return pParent.lock()->get_fullname() + "/" + name;
-}
-
-
-
-size_t HDF5DataSet2DStd::get_length() const
-{
-    return length;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-HDF5DataSet1DStd::HDF5DataSet1DStd( const string& name, HDF5GroupPtrWeak pParent, const HDF5DataSet1DStdSettings& settings)
-    : length(0), name(name), pParent(pParent), settings(settings)
-{
-    hsize_t data_dims[1] = {0};
-    hsize_t data_max_dims[1] = {H5S_UNLIMITED} ;
-    dataspace_id = H5Screate_simple(1, data_dims, data_max_dims);
-
-    hsize_t chunk_dims[1] = {50}; 
-    hid_t prop = H5Pcreate(H5P_DATASET_CREATE);
-    H5Pset_chunk (prop, 1, chunk_dims);
-
-    dataset_id = H5Dcreate2 (pParent.lock()->group_id, name.c_str(), settings.type, dataspace_id, H5P_DEFAULT, prop, H5P_DEFAULT);
-    H5Pclose (prop);
-}
-
-
-
-
-HDF5DataSet1DStd::~HDF5DataSet1DStd()
-{
-    H5Dclose(dataset_id);
-    H5Sclose(dataspace_id);
-}
-
-std::string HDF5DataSet1DStd::get_fullname() const
-{
-    return pParent.lock()->get_fullname() + "/" + name;
-}
-
-
-
-
-
-size_t HDF5DataSet1DStd::get_length() const
-{
-    return length;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -214,12 +90,10 @@ HDF5Group::HDF5Group(const string& location, HDF5FilePtrWeak fileptr,  HDF5Group
 
     if( is_root() )
     {
-        //cout << "\nCreating Root Group: " << location;
+        // Pass
     }
     else
     {
-        //cout << "\nCreating Group: " << location;
-
         HDF5GroupPtr parent = parentptr.lock();
         if(parent->is_root() )
         {
@@ -418,13 +292,11 @@ HDF5File::HDF5File(const string& filename)
 
 HDF5File::~HDF5File()
 {
-    //cout << "\nClosing HDF file: " << filename << "\n";
-    //cout << "\n - Releasing groups: ";
     root_group.reset();
 
-    //cout << "\n - Releasing handle";
+
     H5Fclose(this->file_id);
-    //cout << "\n(OK)" << std::flush;
+    cout << "\nHDF-jive:closed file: " << filename << "\n" << std::flush;
 }
 
 

@@ -3,6 +3,7 @@ import argparse
 
 
 import cmdline_plot
+import cmdline_plotraster
 
 
 
@@ -12,6 +13,7 @@ def build_argparser():
     parser = argparse.ArgumentParser(description='HDF-jive command-line tools')
     subparsers = parser.add_subparsers(help='sub-command help')
     cmdline_plot.build_subparser(subparsers)
+    cmdline_plotraster.build_subparser(subparsers)
     return parser
 
 
