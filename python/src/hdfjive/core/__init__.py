@@ -10,23 +10,26 @@ from hdfjive.tagselection import TagSelector
 
 class SimulationResultTraces(object):
     def __init__(self, node):
-
         self.node = node
-
         self._time_pts=None
         self._data_pts=None
 
     @property
     def time_pts(self):
         if self._time_pts is None:
-            sf = self.node.time._v_attrs.__dict__["hdfjive:scaling"] if "hdfjive:scaling" in self.node.time._v_attrs.__dict__ else 1.0
-            self._time_pts  = self.node.time().read() * sf
+
+            # Dereference this, because its actually a soft-link:
+            time_node = self.node.time()
+            
+            sf = time_node._v_attrs.__dict__.get("hdfjive:scaling", None)
+            #assert sf is not None
+            self._time_pts  = time_node.read() * sf
         return self._time_pts
         
     @property
     def data_pts(self):
         if self._data_pts is None:
-            sf = self.node.data._v_attrs.__dict__["hdfjive:scaling"] if "hdfjive:scaling" in self.node.data._v_attrs.__dict__ else 1.0
+            sf = self.node.data._v_attrs.__dict__.get("hdfjive:scaling", 1.0) 
             self._data_pts  = self.node.data.read() * sf
         return self._data_pts
 
@@ -46,7 +49,7 @@ class SimulationResultEventsProxy(object):
     @property
     def times(self):
         if self._times is None:
-            sf = self.times_node._v_attrs.__dict__["hdfjive:scaling"] if "hdfjive:scaling" in self.times_node._v_attrs.__dict__ else 1.0
+            sf = self.times_node._v_attrs.__dict__.get("hdfjive:scaling", 1.0) 
             self._times = self.times_node.read() * sf
         return self._times
 
@@ -173,18 +176,19 @@ class HDF5SimulationResultFileSet(object):
 
         # Lets set 0 at the top, and working down:
         
-        #plot_offset = 0
+        
         
         for rgi, rg in enumerate(raster_groups):
-            print 'Plotting Raster (%s)' % rg.name
+            #print 'Plotting Raster (%s)' % rg.name
             ax = f.add_subplot(len(raster_groups),1,rgi+1)
             ax.invert_yaxis()
+            legend_data = []
             
             n_objs = None
             for sg in rg.subgroups:
                 evtsset = [evproxy.times for evproxy in self.filter_events(sg.tagstring)]
                 
-                print ' --', sg
+                #print ' --', sg
                 
 
                 # Sanity Checking!
@@ -199,7 +203,10 @@ class HDF5SimulationResultFileSet(object):
                     
                     l = ax.scatter( evts, np.ones_like(evts) * i, **kwargs)
 
-            ax.legend([l],['My Legend'])
+                legend_data.append( (l,sg.label) )
+
+            ax.legend( *zip(*legend_data) )
+                
             ax.set_ylabel(rg.name)
 
             if(rgi != len(raster_groups) -1 ):
@@ -210,8 +217,10 @@ class HDF5SimulationResultFileSet(object):
 
             if xlim:
                 pylab.xlim(*xlim)
-        
-            pylab.ylim(0, n_objs)  
+
+            #5% margins:
+            margin = float(n_objs) * 0.10
+            pylab.ylim(n_objs+margin,0-margin)  
 
         
         pylab.show()
@@ -259,6 +268,9 @@ class HDF5SimulationResultFile(object):
         # Now, construct the SimulationResult objects:
         res_traces = [ SimulationResultTraceProxy(gr) for gr in hdfjive_trace_groups]
         res_events = [ SimulationResultEventsProxy(gr) for gr in hdfjive_events_groups]
+
+        res_traces.sort(key=lambda o:o.group._v_pathname)
+        res_events.sort(key=lambda o:o.group._v_pathname)
         return res_traces, res_events
 
 

@@ -9,7 +9,8 @@ class RasterGroup(object):
 
 
 class RasterSubgroup(object):
-    def __init__(self, tagstring, mplkwargs):
+    def __init__(self, label, tagstring, mplkwargs):
+        self.label = label
         self.tagstring = tagstring
         self.mplkwargs = mplkwargs
 
