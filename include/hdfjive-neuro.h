@@ -133,6 +133,14 @@ public:
 
 
 
+    void _append_standard_tags(const std::string& populationname, size_t index, const std::string& record_name, TagList& tags)
+    {
+        tags.insert(record_name);
+        tags.insert((boost::format("POPINDEX:%04d")%index).str() );
+        tags.insert((boost::format("POPNAME:%s")%populationname).str() );
+        
+    }
+
 
     /**
      * Record a trace to the hdfjive file, using a pointer to the raw data. The length of the array should be the same as the time-buffer.
@@ -151,9 +159,8 @@ public:
 
         // Create a list of tags, including those specified:
         TagList tags(tags_in);
-        tags.insert(record_name);
-        tags.insert((boost::format("POPINDEX:%04d")%index).str() );
-        tags.insert((boost::format("POPNAME:%s")%populationname).str() );
+        _append_standard_tags(populationname, index, record_name, tags);
+
 
         // Add the tags to the node-group:
         pNodeGroup->add_attribute("hdf-jive", "trace");
@@ -178,11 +185,9 @@ public:
     HDF5DataSet2DStdPtr write_trace(const std::string& populationname, size_t index, const std::string& record_name, SharedTimeBufferPtr times, FwdIt it, FwdIt end, const TagList& tags=TagList())
     {
         typedef typename std::iterator_traits<FwdIt>::value_type T;
-
         // Copy the data into a vector, so that its contiguous:
         std::vector<T> data(it, end);
         assert(data.size() == times->get_size());
-
         return write_trace<T>(populationname, index, record_name, times,  &data[0], tags);
     }
 
@@ -198,7 +203,7 @@ public:
      // A. With no parameters:
      // i. Simple, a pointer to an array of spike-times:
     template<typename DATATYPE>
-    EventDataSetTuple write_outputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, size_t n_events, DATATYPE* times, const TagList& tags=TagList() )
+    EventDataSetTuple write_outputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, size_t n_events, DATATYPE* times, const TagList& tags_in=TagList() )
     {
         HDF5GroupPtr pGroup = pSimulationGroup
         ->get_group(populationname)
@@ -207,6 +212,11 @@ public:
         ->get_group(record_name);
 
         // Add the tags to the node-group:
+        TagList tags(tags_in);
+        _append_standard_tags(populationname, index, record_name, tags);
+        tags.insert("output-events");
+        
+        
         pGroup->add_attribute("hdf-jive", "events");
         pGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
 
@@ -231,7 +241,7 @@ public:
 
 
     template<typename EXTRACTORTYPE, typename FwdIt>
-    EventDataSetTuple write_outputevents_byobjects_extractor(const std::string& populationname, size_t index, const std::string& record_name, FwdIt start, FwdIt stop, const TagList& tags=TagList() )
+    EventDataSetTuple write_outputevents_byobjects_extractor(const std::string& populationname, size_t index, const std::string& record_name, FwdIt start, FwdIt stop, const TagList& tags_in=TagList() )
     {
         // Check that the thing being iterated over, and the extractor take the same type:
         static_assert(std::is_same<typename std::iterator_traits<FwdIt>::value_type, typename EXTRACTORTYPE::EVENTTYPE>::value, "jklkjl");
@@ -242,6 +252,11 @@ public:
         ->get_group((boost::format("%04d")%index).str() )
         ->get_group("output_events")
         ->get_group(record_name);
+
+        // Add the tags to the node-group:
+        TagList tags(tags_in);
+        _append_standard_tags(populationname, index, record_name, tags);
+        tags.insert("output-events");
 
         // Add the tags to the node-group:
         pGroup->add_attribute("hdf-jive", "events");
@@ -267,13 +282,14 @@ public:
 
         // Create datasets with the data:
         HDF5DataSet1DStdPtr pEventTimes = pGroup->create_empty_dataset1D("times",    HDF5DataSet1DStdSettings( hdfjive::util::CPPTypeToHDFType<DTYPE>::get_hdf_type() ) );
-        pEventTimes->set_data(n_events, times);
+        
+        if(n_events>0) { pEventTimes->set_data(n_events, times); }
 
         for(size_t p=0;p<n_params;p++)
         {
             std::string pname = EXTRACTORTYPE::get_parameter_name(p); (boost::format("param-%d")%p).str();
             HDF5DataSet1DStdPtr pEventData  = pGroup->create_empty_dataset1D(pname, HDF5DataSet1DStdSettings( hdfjive::util::CPPTypeToHDFType<DTYPE>::get_hdf_type()  ) );
-            pEventData->set_data(n_events, parameters[p] );
+            if(n_events>0){ pEventData->set_data(n_events, parameters[p] ); }
         }
 
         return EventDataSetTuple(pEventTimes);
@@ -288,7 +304,7 @@ public:
      // A. With no parameters (no reference to input events):
      // i. Simple, a pointer to an array of spike-times:
     template<typename DATATYPE>
-    EventDataSetTuple write_inputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, size_t n_events, DATATYPE* times, const TagList& tags=TagList() )
+    EventDataSetTuple write_inputevents_onlytimes( const std::string& populationname, size_t index, const std::string& record_name, size_t n_events, DATATYPE* times, const TagList& tags_in=TagList() )
     {
         HDF5GroupPtr pGroup = pSimulationGroup
         ->get_group(populationname)
@@ -297,8 +313,13 @@ public:
         ->get_group(record_name);
 
         // Add the tags to the node-group:
+        TagList tags(tags_in);
+        _append_standard_tags(populationname, index, record_name, tags);
+        tags.insert("input-events");
+
         pGroup->add_attribute("hdf-jive", "events");
         pGroup->add_attribute("hdf-jive:tags", boost::algorithm::join(tags, ", "));
+
 
         // Create a dataset here with the data:
         HDF5DataSet1DStdPtr pDataSet = pGroup->create_empty_dataset1D("event_times", HDF5DataSet1DStdSettings( hdfjive::util::CPPTypeToHDFType<DATATYPE>::get_hdf_type() ) );
@@ -320,7 +341,7 @@ public:
 
     // B. With parameters, storing events as objects:
     template<typename EXTRACTORTYPE, typename FwdIt>
-    EventDataSetTuple write_inputevents_byobjects_extractor(const std::string& populationname, size_t index, const std::string& record_name, FwdIt start, FwdIt stop, const TagList& tags=TagList() )
+    EventDataSetTuple write_inputevents_byobjects_extractor(const std::string& populationname, size_t index, const std::string& record_name, FwdIt start, FwdIt stop, const TagList& tags_in=TagList() )
     {
         // Check that the thing being iterated over, and the extractor take the same type:
         static_assert(std::is_same<typename std::iterator_traits<FwdIt>::value_type, typename EXTRACTORTYPE::EVENTTYPE>::value, "jklkjl");
@@ -331,6 +352,12 @@ public:
         ->get_group((boost::format("%04d")%index).str() )
         ->get_group("input_events")
         ->get_group(record_name);
+
+
+        // Add the tags to the node-group:
+        TagList tags(tags_in);
+        _append_standard_tags(populationname, index, record_name, tags);
+        tags.insert("input-events");
 
         // Add the tags to the node-group:
         pGroup->add_attribute("hdf-jive", "events");
@@ -355,13 +382,14 @@ public:
 
         // Create datasets with the data:
         HDF5DataSet1DStdPtr pEventTimes = pGroup->create_empty_dataset1D("times",    HDF5DataSet1DStdSettings( hdfjive::util::CPPTypeToHDFType<DTYPE>::get_hdf_type() ) );
-        pEventTimes->set_data(n_events, times);
+        if(n_events > 0) { pEventTimes->set_data(n_events, times); }
 
         for(size_t p=0;p<n_params;p++)
         {
             std::string pname = EXTRACTORTYPE::get_parameter_name(p); (boost::format("param-%d")%p).str();
             HDF5DataSet1DStdPtr pEventData  = pGroup->create_empty_dataset1D(pname, HDF5DataSet1DStdSettings( hdfjive::util::CPPTypeToHDFType<DTYPE>::get_hdf_type()  ) );
-            pEventData->set_data(n_events, parameters[p] );
+
+            if(n_events > 0){ pEventData->set_data(n_events, parameters[p] ); }
         }
 
 
