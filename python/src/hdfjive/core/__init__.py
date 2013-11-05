@@ -22,14 +22,15 @@ class SimulationResultTraces(object):
             time_node = self.node.time()
             
             sf = time_node._v_attrs.__dict__.get("hdfjive:scaling", None)
-            #assert sf is not None
+            assert sf is not None
             self._time_pts  = time_node.read() * sf
         return self._time_pts
         
     @property
     def data_pts(self):
         if self._data_pts is None:
-            sf = self.node.data._v_attrs.__dict__.get("hdfjive:scaling", 1.0) 
+            sf = self.node.data._v_attrs.__dict__.get("hdfjive:scaling", 1.0)
+            assert sf is not None
             self._data_pts  = self.node.data.read() * sf
         return self._data_pts
 
