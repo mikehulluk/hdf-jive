@@ -4,6 +4,7 @@ import argparse
 
 import cmdline_plot
 import cmdline_plotraster
+import cmdline_compare
 
 
 
@@ -14,6 +15,7 @@ def build_argparser():
     subparsers = parser.add_subparsers(help='sub-command help')
     cmdline_plot.build_subparser(subparsers)
     cmdline_plotraster.build_subparser(subparsers)
+    cmdline_compare.build_subparser(subparsers)
     return parser
 
 
