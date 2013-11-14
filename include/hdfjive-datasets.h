@@ -164,6 +164,9 @@ public:
 
         //this->length = new_data_dims[0];
         this->_set_length(new_data_dims[0]);
+
+        // Flush the caches:
+        H5Fflush( *dataset_id, H5F_SCOPE_GLOBAL);
     }
 
 
@@ -194,6 +197,9 @@ public:
 
         // Store the length:
         this->_set_length(N);
+
+        // Flush the caches:
+        H5Fflush( *dataset_id, H5F_SCOPE_GLOBAL);
     }
 
 };
@@ -250,6 +256,9 @@ public:
 
         // Save the new length:
         this->_set_length(new_data_dims[0]);
+
+        // Flush the caches:
+        H5Fflush( *dataset_id, H5F_SCOPE_GLOBAL);
     }
 
 
@@ -279,6 +288,9 @@ public:
         
         //this->length = M;
         this->_set_length(M);
+
+        // Flush the caches:
+        H5Fflush( *dataset_id, H5F_SCOPE_GLOBAL);
     }
 
 };

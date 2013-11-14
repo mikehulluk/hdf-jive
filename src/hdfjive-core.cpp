@@ -325,8 +325,16 @@ HDF5DataSet2DStdPtr HDF5File::get_dataset2D(const std::string& location)
 //herr_t my_hdf5_error_handler (void *unused)
 herr_t my_hdf5_error_handler (hid_t estack_id, void *unused)
 {
-   fprintf (stderr, "An HDF5 error was detected. Bye.\n");
+   // Flush everything
+   fflush(stdout); fflush(stderr);
+
+   // Write output error message: 
+   fprintf (stderr, "\nAn HDF5 error was detected: \n");
+   fflush(stderr);
    H5Eprint2(H5E_DEFAULT, stderr);
-   assert(0);
-   exit (1);
+   fprintf (stderr, "\n");
+   fflush(stderr);
+
+   // and exit:
+   exit (EXIT_FAILURE);
 }

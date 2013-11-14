@@ -61,8 +61,9 @@ public:
 
 
 
-struct EventDataSetTuple
+class EventDataSetTuple
 {
+public:
     HDF5DataSet1DStdPtr spiketimes;
 
     EventDataSetTuple(HDF5DataSet1DStdPtr spiketimes)
