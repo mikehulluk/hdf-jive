@@ -1,6 +1,6 @@
 
 import os
- 
+
 
 import tables
 
@@ -20,12 +20,12 @@ class SimulationResultTraces(object):
 
             # Dereference this, because its actually a soft-link:
             time_node = self.node.time()
-            
+
             sf = time_node._v_attrs.__dict__.get("hdfjive:scaling", None)
             assert sf is not None
             self._time_pts  = time_node.read() * sf
         return self._time_pts
-        
+
     @property
     def data_pts(self):
         if self._data_pts is None:
@@ -34,7 +34,7 @@ class SimulationResultTraces(object):
             self._data_pts  = self.node.data.read() * sf
         return self._data_pts
 
-            
+
 
 
 
@@ -45,12 +45,12 @@ class SimulationResultEventsProxy(object):
 
         self.times_node = group._f_getChild("times")
         self._times = None
-        
+
 
     @property
     def times(self):
         if self._times is None:
-            sf = self.times_node._v_attrs.__dict__.get("hdfjive:scaling", 1.0) 
+            sf = self.times_node._v_attrs.__dict__.get("hdfjive:scaling", 1.0)
             self._times = self.times_node.read() * sf
         return self._times
 
@@ -85,7 +85,7 @@ class HDF5SimulationResultFileSet(object):
 
     def filter_traces(self, selector):
         return list(it.chain( *[f.filter_traces(selector) for f in self.results_files] ) )
-        
+
     def filter_events(self, selector):
         return list(it.chain( *[f.filter_events(selector) for f in self.results_files] ) )
 
@@ -93,7 +93,7 @@ class HDF5SimulationResultFileSet(object):
 
 
 
-    def plot(self, trace_filters=None, spike_filters=None, xlim=None, ylim=None, legend=False, xlabel=None, xscale=None):
+    def plot(self, trace_filters=None, spike_filters=None, xlim=None, ylim=None, legend=False, xlabel=None, xscale=None, fig_trace_kwargs=None, fig_event_kwargs=None):
         import pylab
         import mreorg
         import numpy as np
@@ -101,10 +101,15 @@ class HDF5SimulationResultFileSet(object):
         trace_filters = trace_filters or []
         spike_filters = spike_filters or []
 
-        for filt in trace_filters:
-            fig = pylab.figure()
+        fig_trace_kwargs = fig_trace_kwargs or {}
+        fig_event_kwargs = fig_event_kwargs or {}
 
-            trs = self.filter_traces(filt) 
+        tr_figs = []
+        for filt in trace_filters:
+            fig = pylab.figure(**fig_trace_kwargs)
+            tr_figs.append(fig)
+
+            trs = self.filter_traces(filt)
 
 
             print 'Plotting:', filt, len(trs)
@@ -141,15 +146,17 @@ class HDF5SimulationResultFileSet(object):
                 mreorg.PM.save_active_figures()
 
 
+        spike_figs = []
         for filt in spike_filters:
-            pylab.figure()
+            f2 = pylab.figure(**fig_event_kwargs)
+            spike_figs.append(f2)
             #trs = self.filter_events(filt)
             trs = list(it.chain( *[f.filter_events(filt) for f in self.results_files] ) )
             trs = self.filter_events(filt)
             print ' -- plotting:', filt, len(trs)
             for i,res in enumerate(trs):
                 evt_times = res.times
-                
+
                 pylab.plot( evt_times, i+ 0*evt_times, 'x', label=','.join(res.tags))
             if xlim:
                 pylab.xlim(*xlim)
@@ -162,57 +169,62 @@ class HDF5SimulationResultFileSet(object):
                 pylab.ylim(0, len(trs))
             mreorg.PM.save_active_figures()
 
+        return tr_figs, spike_figs
 
-    def raster_plot(self, raster_groups, xlim=None):
+
+    def raster_plot(self, raster_groups, xlim=None, fig_kwargs=None, legend=False):
         print 'Plotting Raster'
         import pylab
         import mreorg
         import numpy as np
 
+        fig_kwargs = fig_kwargs or {}
 
         group_separation = 5
 
-        f = pylab.figure()
+        f = pylab.figure(**fig_kwargs)
         f.subplots_adjust(bottom=0.2,hspace=0.05)
 
         # Lets set 0 at the top, and working down:
-        
-        
-        
+
+
+
         for rgi, rg in enumerate(raster_groups):
             #print 'Plotting Raster (%s)' % rg.name
             ax = f.add_subplot(len(raster_groups),1,rgi+1)
             ax.invert_yaxis()
             legend_data = []
-            
+
             n_objs = None
             for sg in rg.subgroups:
                 evtsset = [evproxy.times for evproxy in self.filter_events(sg.tagstring)]
-                
+
                 #print ' --', sg
-                
+
 
                 # Sanity Checking!
                 if n_objs is None:
                     n_objs = len(evtsset)
                 else:
-                    assert n_objs==len(evtsset)
+                    #assert n_objs==len(evtsset)
+                    pass
 
                 for i,evts in enumerate(evtsset):
                     kwargs = {'marker':'x' }
-                    kwargs.update(sg.mplkwargs) 
-                    
+                    kwargs.update(sg.mplkwargs)
+
                     l = ax.scatter( evts, np.ones_like(evts) * i, **kwargs)
 
                 legend_data.append( (l,sg.label) )
 
-            ax.legend( *zip(*legend_data) )
-                
+            if legend:
+                ax.legend( *zip(*legend_data) )
+
             ax.set_ylabel(rg.name)
 
             if(rgi != len(raster_groups) -1 ):
                 ax.set_xticklabels('')
-                
+
 
 
 
@@ -221,9 +233,10 @@ class HDF5SimulationResultFileSet(object):
 
             #5% margins:
             margin = float(n_objs) * 0.10
-            pylab.ylim(n_objs+margin,0-margin)  
+            pylab.ylim(n_objs+margin,0-margin)
 
-        
+
+        return f
         pylab.show()
 
 
@@ -288,9 +301,9 @@ class HDF5SimulationResultFile(object):
 
 
     def plot(self, *args, **kwargs):
-        HDF5SimulationResultFileSet(self).plot(*args, **kwargs)
+        return HDF5SimulationResultFileSet(self).plot(*args, **kwargs)
     def raster_plot(self, *args, **kwargs):
-        HDF5SimulationResultFileSet(self).raster_plot(*args, **kwargs)
+        return HDF5SimulationResultFileSet(self).raster_plot(*args, **kwargs)
 
 
     def find_eventsets(self, tag_selection, min_spikes=1):
@@ -301,6 +314,6 @@ class HDF5SimulationResultFile(object):
                 valid_evtsets.append(evtset)
         return valid_evtsets
 
-        
+
 
 
