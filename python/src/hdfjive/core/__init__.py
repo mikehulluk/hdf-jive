@@ -125,7 +125,7 @@ class HDF5SimulationResultFileSet(object):
 
                 if xscale is not None:
                     time = time * xscale
-                pylab.plot(time, data,'x-', label=','.join(res.tags), ms=2 )
+                pylab.plot(time, data,'-', label=','.join(res.tags), ms=2 )
 
             if len(trs)==0:
                 pylab.close(fig)
